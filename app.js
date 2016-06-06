@@ -12,7 +12,7 @@ var app = express();
 var bookServer = require('./bookServer.js');
 bookServer.initialiseServer(
   {
-    booksDocRoot: '.\\public\\content\\books'
+    booksDocRoot: '..\\public\\content\\books'
   }
 );
 

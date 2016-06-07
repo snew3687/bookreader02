@@ -34,6 +34,9 @@ app.use(cookieParser());
 ******/
 
 // bookserver routing handling
+app.get('/', function(request, response) {
+  response.redirect('/default.html');
+});
 
 // Get all book descriptors
 app.get('/books/all', function(request, response) {

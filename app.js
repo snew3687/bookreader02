@@ -33,6 +33,8 @@ app.use(cookieParser());
 
 ******/
 
+app.set('view engine', 'jade');
+
 // bookserver routing handling
 app.get('/', function(request, response) {
   response.redirect('/default.html');

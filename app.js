@@ -40,6 +40,10 @@ app.get('/', function(request, response) {
   response.redirect('/default.html');
 });
 
+app.get('/bookReader/:bookUri', function(request, response) {
+  response.redirect('/bookReader.html?bookUri=' + request.params.bookUri);
+});
+
 // Get all book descriptors
 app.get('/books/all', function(request, response) {
   var bookUri = request.params.bookUri;

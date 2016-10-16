@@ -3,7 +3,7 @@
   <head>
     <title>Book Reader</title>
     <script src="scripts/jquery-1.12.3.js"></script>
-    <script src="scripts/bookReader.js"></script>
+    <script src="scripts/bookCatalogue.js"></script>
   </head>
   <body>
 
@@ -20,37 +20,10 @@
       </ul> 
     </div> <!-- id="bookListContainer" -->
 
-    <div id="bookHeader">
-      <h1>BOOK_TITLE_HERE</h1>
-      <p id="bookAuthor">BOOK_AUTHOR_HERE</p>
-    </div> <!-- id="bookHeader" -->
-    
-    <div id="chapterControlContainer">
-      <a id="chapterControlFirst" href="#">First</a>
-      <a id="chapterControlPrevious" href="#">Previous</a>
-      <a id="chapterControlNext" href="#">Next</a>
-      <a id="chapterControlLast" href="#">Last</a>
-
-      <select id="chapterControlNumber">
-        <option value="NO_CHAPTER" selected>Select Chapter</option>
-      </select>      
-
-    </div> <!-- id="chapterControlContainer" -->
-
-    <div id="readingAreaContainer">
-      <p>
-        Book chapters will go here
-      </p>
-
-    </div> <!-- id="readingAreaContainer" -->
-    <div id="hiddenFields">
-      <input hidden="hidden" type="number" id="chapterToFetch" value='1' />
-    </div><!-- id="hiddenFields" -->
-
   </body>
   <script>
     $(document).ready(function() {
-      bookReader.initialise();
+      bookCatalogue.initialise();
     });
   </script>
 </html>

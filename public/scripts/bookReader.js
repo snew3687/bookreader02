@@ -14,7 +14,7 @@ var bookReader = function() {
 
   var initialise = function initialise() {
     initialiseChapterControlHandlers();
-    loadAllBookInformation();
+    initialiseForCurrentBook();
   };
 
   function initialiseChapterControlHandlers() {
@@ -53,51 +53,13 @@ var bookReader = function() {
     handleFetchChapter();
   }
 
-  function handleBookLinkClick(evt) {
-    evt.preventDefault();
-    currentBookUri = $(this).attr('data-bookUri');
-
+  function initialiseForCurrentBook(evt) {
+    currentBookUri = getQueryParameter('bookUri');
     loadBookInformation();
 
     // Load first chapter
     $('#chapterToFetch').val(1);
     handleFetchChapter();
-  }
-
-  function loadAllBookInformation() {
-
-    $.ajax({
-      url: "books/all",
-      type: 'GET',
-      success: listAllBookInformation
-    });
-  }
-
-  function listAllBookInformation(allBookDescriptors) {
-    var $list = $('div#bookListContainer > ul');
-    $list.children().remove();
-    $(allBookDescriptors).each(function(index, item) {
-      $list.append($(
-        '<li>' +
-          '<a class="bookLink" href="#" data-bookUri="' + item.bookUri + '">' +
-            '<span class="authorName">' + item.Author + '</span>' +
-            '&#45;' +
-            '<span class="bookTitle">' + item.Title + '</span>' +
-          '</a>' +
-        '</li>' 
-      ));
-    });
-
-    $("a.bookLink").on('click', handleBookLinkClick);
-    /****
-        <li>
-          <a class="bookLink" href="#" data-bookUri="JaneAusten_PrideAndPrejudice">
-            <span class="authorName">Jane Austen</span>
-            &#45;
-            <span class="bookTitle">Pride and Prejudice</span>
-          </a>
-        </li> 
-    ****/
   }
 
   function loadBookInformation() {
@@ -157,6 +119,12 @@ var bookReader = function() {
     // Align chapter number selector with new chapter
     var chapterNumber = $('#chapterToFetch').val();
     $("#chapterControlNumber").val(chapterNumber);
+  }
+
+  function getQueryParameter(parameterName) {
+    var queryDict = {};
+    location.search.substr(1).split("&").forEach(function(item) {queryDict[item.split("=")[0]] = item.split("=")[1]});
+    return queryDict[parameterName];
   }
 
   return {

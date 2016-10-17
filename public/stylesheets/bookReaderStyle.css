@@ -1,0 +1,20 @@
+div#bookHeader {
+  width : 100%;
+  border: solid black;
+}
+
+
+div#bookTitleContainer {
+  display: inline;
+  float: left;
+}
+
+div#bookAuthor {
+  display: inline;
+  float: right;
+  padding: 5px;
+}
+
+div#chapterControlContainer {
+  clear: both;
+}

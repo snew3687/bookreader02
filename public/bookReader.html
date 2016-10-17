@@ -4,14 +4,17 @@
     <title>Book Reader</title>
     <script src="scripts/jquery-1.12.3.js"></script>
     <script src="scripts/bookReader.js"></script>
+    <link rel="stylesheet" href="stylesheets/bookReaderStyle.css" type="text/css" />
   </head>
   <body>
 
     <div id="bookHeader">
-      <h1>BOOK_TITLE_HERE</h1>
-      <p id="bookAuthor">BOOK_AUTHOR_HERE</p>
-    </div> <!-- id="bookHeader" -->
-    
+      <div id="bookTitleContainer">
+        <h1 id="bookTitle">BOOK_TITLE_HERE</h1>
+      </div>
+      <div id="bookAuthor">BOOK_AUTHOR_HERE</div>
+    </div>
+
     <div id="chapterControlContainer">
       <a id="chapterControlFirst" href="#">First</a>
       <a id="chapterControlPrevious" href="#">Previous</a>

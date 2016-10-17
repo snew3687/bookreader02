@@ -73,7 +73,7 @@ var bookReader = function() {
 
   function storeAndDisplayBookInformation(bookDescriptor) {
     currentBookDescriptor = bookDescriptor;
-    $('div#bookHeader h1').text(currentBookDescriptor.Title);
+    $('#bookTitle').text(currentBookDescriptor.Title);
     $('#bookAuthor').text(currentBookDescriptor.Author);
     initialiseChapterNumberControl();
   }

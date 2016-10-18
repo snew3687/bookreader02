@@ -8,35 +8,37 @@
   </head>
   <body>
 
-    <div id="bookHeader">
-      <div id="bookTitleContainer">
-        <h1 id="bookTitle">BOOK_TITLE_HERE</h1>
+<!--    <div id="bookReaderContainer"> -->
+      <div class="bookHeader">
+        <div id="bookTitleContainer">
+          <h1 id="bookTitle">BOOK_TITLE_HERE</h1>
+        </div>
+        <div id="bookAuthor">BOOK_AUTHOR_HERE</div>
+
+        <div id="chapterControlContainer">
+          <a id="chapterControlFirst" href="#">First</a>
+          <a id="chapterControlPrevious" href="#">Previous</a>
+          <a id="chapterControlNext" href="#">Next</a>
+          <a id="chapterControlLast" href="#">Last</a>
+
+          <select id="chapterControlNumber">
+            <option value="NO_CHAPTER" selected>Select Chapter</option>
+          </select>      
+        </div> <!-- id="chapterControlContainer" -->
+
       </div>
-      <div id="bookAuthor">BOOK_AUTHOR_HERE</div>
-    </div>
 
-    <div id="chapterControlContainer">
-      <a id="chapterControlFirst" href="#">First</a>
-      <a id="chapterControlPrevious" href="#">Previous</a>
-      <a id="chapterControlNext" href="#">Next</a>
-      <a id="chapterControlLast" href="#">Last</a>
+      <div id="readingAreaContainer">
+        <p>
+          Book chapters will go here
+        </p>
 
-      <select id="chapterControlNumber">
-        <option value="NO_CHAPTER" selected>Select Chapter</option>
-      </select>      
+      </div> <!-- id="readingAreaContainer" -->
+      <div id="hiddenFields">
+        <input hidden="hidden" type="number" id="chapterToFetch" value='1' />
+      </div><!-- id="hiddenFields" -->
 
-    </div> <!-- id="chapterControlContainer" -->
-
-    <div id="readingAreaContainer">
-      <p>
-        Book chapters will go here
-      </p>
-
-    </div> <!-- id="readingAreaContainer" -->
-    <div id="hiddenFields">
-      <input hidden="hidden" type="number" id="chapterToFetch" value='1' />
-    </div><!-- id="hiddenFields" -->
-
+    <!--</div>--><!-- id="bookReaderContainer" -->
   </body>
   <script>
     $(document).ready(function() {

@@ -1,20 +1,39 @@
-div#bookHeader {
-  width : 100%;
-  border: solid black;
+.bookHeader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: gray;
 }
 
-
 div#bookTitleContainer {
+  border: solid blue;
   display: inline;
-  float: left;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#bookTitle {
+  display: inline;
 }
 
 div#bookAuthor {
   display: inline;
-  float: right;
-  padding: 5px;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 div#chapterControlContainer {
-  clear: both;
+  border: solid black;
+  position: absolute;
+  top: 40px;
+  left: 0;
+  right: 0;
+}
+
+div#readingAreaContainer {
+  position: absolute;
+  top: 106px;
 }

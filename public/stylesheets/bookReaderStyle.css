@@ -1,17 +1,22 @@
-.bookHeader {
+div#bookHeader {
   position: fixed;
   top: 0;
+  height: 78px;
   left: 0;
   right: 0;
-  background: gray;
+  border-style: solid; 
+  border-width: 1;
+  border-color: gray;
+  background: aliceblue;
+  z-index: 10;
 }
 
 div#bookTitleContainer {
-  border: solid blue;
   display: inline;
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 11;
 }
 
 #bookTitle {
@@ -23,17 +28,29 @@ div#bookAuthor {
   position: absolute;
   top: 0;
   right: 0;
+  z-index: 11;
 }
 
 div#chapterControlContainer {
-  border: solid black;
+  border-style: double solid;
+  border-width: 2;
+  border-color: gray;
+  background-color: lightsteelblue;
   position: absolute;
   top: 40px;
-  left: 0;
-  right: 0;
+  height: 30px;
+  left: 2px;
+  right: 2px;
+  z-index: 11;
 }
 
 div#readingAreaContainer {
   position: absolute;
-  top: 106px;
+  top: 78px;
+  bottom: 0;
+  left:0;
+  right: 0;
+/*  overflow: scroll; */
+  background-color: white;
+  z-index: 1;
 }

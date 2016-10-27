@@ -1,0 +1,20 @@
+A. Download a book, Plain Text UTF8, from http://www.gutenberg.org
+B. Save it as "book.txt" in a properly-named sub-directory of $\bookreader02\public\content\books (as an original backup)
+C. Save it, again, as a file "bookChapters.md"
+D. Perform the edit steps, as follows:
+  1. Delete up to start of first chapter
+  2. Add header 2 to all Chapter starts
+    %s/\CChapter /## Chapter /g
+  3. Delete first 8 lines of Gutenberg preamble, to book title
+  4. Break out meta information into JSON file
+  5. Delete these lines:
+    *** START OF THIS PROJECT GUTENBERG EBOOK PRIDE AND PREJUDICE ***
+    Produced by Anonymous Volunteers
+  6. Deleted from this line, onwards, including licensing info:
+    End of the Project Gutenberg EBook of Pride and Prejudice, by Jane Austen
+  7. Delete up to start of first chapter
+  8. Good. Already has _italic_ markers in book text
+  9. Add in pauses, like:
+    %s/--/.../gc
+  10. For any pre-formatted text, add block code markup - ```
+  11. Seem to need to convert to (save as) UTF. Use Editplus to save as UTF8 (not UTF8+BOM)

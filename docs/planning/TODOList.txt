@@ -1,0 +1,20 @@
+
+Technical Ideas
+============================================
++ Use Flexbox to layout
++ Use media queries to choose style sheet suitable for device
++ Research the 12-column layout that Dylan mentioned. Bootstrap uses it?
++ Moustache is a simple templating system that might help
+
+Design Ideas
+============================================
++ Draw some pictures of what I want the app to look like
++ Navigation controls - may be at the top, or at the bottom
+
+
+Functionality Idea
+============================================
++ Maybe a word-count per-page might be useful for calculating page content?
+
+
+

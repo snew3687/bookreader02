@@ -1,7 +1,12 @@
-body {
+
+div#mainSidePanelsBackground {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  background: lavender;
   background-image: url("/images/backgroundStar.png");
   background-repeat: repeat;
-/*  background: lavender; */
 }
 
 div#bookHeader {

@@ -56,6 +56,16 @@ div#chapterControlContainer {
   z-index: 11;
 }
 
+div#currentChapter {
+  display: inline;
+  position: absolute;
+  right: 5px;
+}
+
+.chapterHeader {
+  font-weight: bold;
+}
+
 div#readingAreaContainer {
   position: absolute;
   top: 78px;

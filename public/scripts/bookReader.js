@@ -116,9 +116,16 @@ var bookReader = function() {
   function displayChapter(chapterContent) {
     $('#readingAreaContainer').html(chapterContent);
 
+    displayChapterTitle();
+
     // Align chapter number selector with new chapter
     var chapterNumber = $('#chapterToFetch').val();
     $("#chapterControlNumber").val(chapterNumber);
+  }
+
+  function displayChapterTitle() {
+    var title= $('#readingAreaContainer > h2:first').text();
+    $("#currentChapter").text(title);    
   }
 
   function getQueryParameter(parameterName) {

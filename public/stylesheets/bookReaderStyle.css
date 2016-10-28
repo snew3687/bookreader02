@@ -1,14 +1,21 @@
+body {
+  background-image: url("/images/backgroundStar.png");
+  background-repeat: repeat;
+/*  background: lavender; */
+}
+
 div#bookHeader {
   position: fixed;
   top: 0;
   height: 78px;
-  left: 0;
-  right: 0;
+  left: 10%;
+  right: 10%;
   border-style: solid; 
   border-width: 1;
   border-color: gray;
   background: aliceblue;
   z-index: 10;
+  max-width: 810px; /* Take into account the padding of #readingAreaContainer */
 }
 
 div#bookTitleContainer {
@@ -47,11 +54,15 @@ div#chapterControlContainer {
 div#readingAreaContainer {
   position: absolute;
   top: 78px;
-  bottom: 0;
-  left:0;
-  right: 0;
+  left: 10%;
+  right: 10%;
+  max-width: 800px;
 /* This overflow property worked well. But is it well supported on all browsers? */
 /*  overflow: scroll; */
   background-color: white;
-  z-index: 1;
+  border-style: solid; 
+  border-width: 1;
+  border-color: lightsteelblue;
+  padding-left: 5px;
+  padding-right: 5px;
 }

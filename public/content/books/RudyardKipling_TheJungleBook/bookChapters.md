@@ -1,4 +1,4 @@
-# Mowgli's Brothers
+## Mowgli's Brothers
 
      Now Rann the Kite brings home the night
         That Mang the Bat sets free...
@@ -772,7 +772,7 @@ alone, to meet those mysterious things that are called men.
 
 
 
-# Hunting-Song of the Seeonee Pack
+## Hunting-Song of the Seeonee Pack
 
      As the dawn was breaking the Sambhur belled
         Once, twice and again!
@@ -799,7 +799,7 @@ alone, to meet those mysterious things that are called men.
 
 
 
-# Kaa's Hunting
+## Kaa's Hunting
 
      His spots are the joy of the Leopard: his horns are the
         Buffalo's pride.
@@ -1746,7 +1746,7 @@ never waked when he was put down in the home-cave.
 
 
 
-# Road-Song of the Bandar-Log
+## Road-Song of the Bandar-Log
 
      Here we go in a flung festoon,
      Half-way up to the jealous moon!
@@ -1785,7 +1785,7 @@ never waked when he was put down in the home-cave.
 
 
 
-# "Tiger! Tiger!"
+## "Tiger! Tiger!"
 
      What of the hunting, hunter bold?
         Brother, the watch was long and cold.
@@ -2434,7 +2434,7 @@ But that is a story for grown-ups.
 
 
 
-# Mowgli's Song
+## Mowgli's Song
 
      THAT HE SANG AT THE COUNCIL ROCK WHEN HE
      DANCED ON SHERE KHAN'S HIDE
@@ -2525,7 +2525,7 @@ But that is a story for grown-ups.
 
 
 
-# The White Seal
+## The White Seal
 
      Oh! hush thee, my baby, the night is behind us,
         And black are the waters that sparkled so green.
@@ -3225,7 +3225,7 @@ holluschickie play around him, in that sea where no man comes.
 
 
 
-# Lukannon
+## Lukannon
 
 This is the great deep-sea song that all the St. Paul seals sing when
 they are heading back to their beaches in the summer. It is a sort of
@@ -3264,7 +3264,7 @@ very sad seal National Anthem.
 
 
 
-# "Rikki-Tikki-Tavi"
+## "Rikki-Tikki-Tavi"
 
      At the hole where he went in
      Red-Eye called to Wrinkle-Skin.
@@ -3880,7 +3880,7 @@ inside the walls.
 
 
 
-# Darzee's Chant
+## Darzee's Chant
 
      (Sung in honor of Rikki-tikki-tavi)
 
@@ -3918,7 +3918,7 @@ inside the walls.
 
 
 
-# Toomai of the Elephants
+## Toomai of the Elephants
 
      I will remember what I was, I am sick of rope and chain...
         I will remember my old strength and all my forest affairs.
@@ -4605,7 +4605,7 @@ the heart of the Garo hills!
 
 
 
-# Shiv and the Grasshopper
+## Shiv and the Grasshopper
 
      (The song that Toomai's mother sang to the baby)
 
@@ -4648,7 +4648,7 @@ the heart of the Garo hills!
 
 
 
-# Her Majesty's Servants
+## Her Majesty's Servants
 
      You can work it out by Fractions or by simple Rule of Three,
      But the way of Tweedle-dum is not the way of Tweedle-dee.
@@ -5302,7 +5302,7 @@ Viceroy."
 
 
 
-# Parade Song of the Camp Animals
+## Parade Song of the Camp Animals
 
      ELEPHANTS OF THE GUN TEAMS
 

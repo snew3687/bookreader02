@@ -38,6 +38,11 @@ function forEachBookDirectory(callback) {
   console.log("forEachBookDirectory(): Loaded book directories.");
 }
 
+function ChapterTitleDescriptor(chapterIndex, chapterDisplayIndex, titleText) {
+  this.chapterIndex = chapterIndex;
+  this.chapterDisplayIndex = chapterDisplayIndex;
+  this.titleText = titleText;
+}
 
 function Book(descriptor, chapterSet)
 {
@@ -51,6 +56,7 @@ function loadBook(bookUri) {
   var chapterSet = loadBookChapterSet(bookUri);
   var bookDescriptor = loadBookDescriptor(bookUri); 
   bookDescriptor.chapterCount = chapterSet.length;
+  bookDescriptor.chapterTitles = determineChapterTitles(chapterSet);
   bookDescriptor.bookUri = bookUri;
 
   bookLibrary[bookUri] = new Book(bookDescriptor, chapterSet); 
@@ -71,10 +77,39 @@ function loadBookChapterSet(bookUri) {
   var filepath = booksDocRoot + '\\' + bookUri + '\\bookChapters.md';
   console.log('About to read file - ' + filepath);
   var data = fs.readFileSync(filepath, 'utf8');
-  console.log('About to parse file data - ' + data.substring(0,100));
+  console.log('About to parse file data - ' + data.substring(0,50));
 
   return parseAndLoadBook(data);
 }
+
+function determineChapterTitles(chapterSet) {
+  var chapterTitleDescriptors = [];
+  var chapterTitleDescriptor = null;
+  var chapterDisplayIndex;
+  var title;
+
+  
+  for (var chapterIndex = 0; chapterIndex < chapterSet.length; chapterIndex++) {
+    chapterDisplayIndex = chapterIndex; // TODO - extend this to include non-zero-based, Roman numerals, etc.
+    title = determineHeadingText(chapterSet[chapterIndex].chapterHeading);
+    chapterTitleDescriptor = new ChapterTitleDescriptor(chapterIndex, chapterDisplayIndex, title); 
+    chapterTitleDescriptors.push(chapterTitleDescriptor);
+  }
+  return chapterTitleDescriptors;
+}
+
+function determineHeadingText(headingNode) {
+  var headingText = '';
+  var currentChildNode = headingNode.firstChild;
+  while (currentChildNode) {
+    if (currentChildNode.type == 'text') {
+      headingText += currentChildNode.literal;
+    }
+    currentChildNode = currentChildNode.next;
+  }
+  return headingText;
+}
+
 
 function parseAndLoadBook(fileContent) {
   var parsedBookDocument = reader.parse(fileContent); // parsedBookDocument is a 'Node' tree 
@@ -110,7 +145,34 @@ function parseAndLoadBook(fileContent) {
   return chapterSet;
 }
 
-function getBookDescriptor(bookUri) {
+function cloneDescriptorWithoutTitles(descriptor) {
+    // Shallow clone the original, so as not to clear out the chapterTitles
+    try {
+      // Commented out - for some reason Object.create() does not work
+      //var clone = Object.create(null, descriptor); 
+      var clone = 
+      {
+        "bookUri": descriptor.bookUri,
+        "chapterCount": descriptor.chapterCount,
+        "chapterCounter": descriptor.chapterCounter,
+        "Title": descriptor.Title,
+        "Author": descriptor.Author,
+        "ReleaseDate": descriptor.ReleaseDate,
+        "Language": descriptor.Language
+      };
+
+      console.log("Cloned descriptor");
+      return clone;
+
+    } catch (ex) {
+      console.log("Exception occurred - " + e);
+      throw ex;
+    }
+}
+
+function getBookDescriptor(bookUri, isFetchChapterTitles) {
+  console.log("getBookDescriptor(): Start. isFetchChapterTitles = " + isFetchChapterTitles);
+
   var book;
   var result = 
   {
@@ -128,17 +190,29 @@ function getBookDescriptor(bookUri) {
     result = bookLibrary[bookUri].descriptor;
     result.chapterCounter = 0;
   }
+
+  if (result.chapterTitles) {
+    console.log("chapterTitleCount = " + result.chapterTitles.length);
+  } else {
+    console.log("No chapter titles loaded");
+  }
+
+  // Chapter titles are loaded into the descriptor by default. But
+  // don't return them if they are not needed
+  if (!isFetchChapterTitles) {
+    result = cloneDescriptorWithoutTitles(result); 
+  }
   return result;
 }
 
-function getBookChapter(bookUri, chapterNumber) {
+function getBookChapter(bookUri, chapterIndex) {
+  var chapterNumber = chapterIndex + 1;
   var result = '<p>Chapter - ' + chapterNumber + ' - not found</p>';
 
   if (!loadBook(bookUri)) {
     return '<p>Book not found for URL - ' + bookUrl;
   }
 
-  var chapterIndex = chapterNumber - 1;
   var book = bookLibrary[bookUri];
   var chapterEntry;
 
@@ -165,9 +239,15 @@ function getBookChapter(bookUri, chapterNumber) {
 function getAllBookDescriptors() {
   var result = [];
   var bookUri = '';
+  var nextDescriptor;
 
+  console.log("Invoking getAllBookDescriptors()...");
   for (bookUri in bookLibrary) {
-    result.push(bookLibrary[bookUri].descriptor);
+    // Chapter titles are loaded into the descriptor by default. But
+    // don't return them if they are not needed
+    console.log("Fetching book with URI - " + bookUri);
+    nextDescriptor = cloneDescriptorWithoutTitles(bookLibrary[bookUri].descriptor);
+    result.push(nextDescriptor);
   }
   return result;
 }

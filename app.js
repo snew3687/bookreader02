@@ -58,7 +58,9 @@ app.get('/books/all', function(request, response) {
 // Get book descriptor
 app.get('/books/:bookUri', function(request, response) {
   var bookUri = request.params.bookUri;
-  var bookDescriptor = bookServer.getBookDescriptor(bookUri);
+  var isFetchChapterTitles = request.query.chapterTitles;
+  
+  var bookDescriptor = bookServer.getBookDescriptor(bookUri, isFetchChapterTitles);
 
   response.type('json');
   response

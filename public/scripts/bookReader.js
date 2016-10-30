@@ -30,17 +30,14 @@ var bookReader = function() {
   }
 
   function initialiseChapterNumberControl() {
-    var allChapterNumbers = [];
 
     $('#chapterControlNumber').unbind('change');
     $('#chapterControlNumber').children().remove();
 
-    for (var i = 1; i <= currentBookDescriptor.chapterCount; ++i) allChapterNumbers.push(i);
-
-    $.each(allChapterNumbers, function (i, item) {
+    $.each(currentBookDescriptor.chapterTitles, function (i, titleDescriptor) {
         $('#chapterControlNumber').append($('<option>', { 
-            value: item,
-            text : 'Chapter ' + item 
+            value: titleDescriptor.chapterIndex,
+            text : titleDescriptor.titleText
         }));
     });
 
@@ -58,14 +55,14 @@ var bookReader = function() {
     loadBookInformation();
 
     // Load first chapter
-    $('#chapterToFetch').val(1);
+    $('#chapterToFetch').val(0);
     handleFetchChapter();
   }
 
   function loadBookInformation() {
 
     $.ajax({
-      url: "books/" + currentBookUri,
+      url: "books/" + currentBookUri + "?chapterTitles=true",
       type: 'GET',
       success: storeAndDisplayBookInformation
     });
@@ -84,19 +81,19 @@ var bookReader = function() {
     var fetchType = evt.data.fetchType;
     var chapterNumber = Number($("#chapterToFetch").val());
     if (fetchType === 'first') {
-      chapterNumber = 1;
+      chapterNumber = 0;
     } else if (fetchType === 'previous') { 
       chapterNumber -= 1;
     } else if (fetchType === 'next') { 
       chapterNumber += 1;
     } else if (fetchType === 'last') { 
-      chapterNumber = currentBookDescriptor.chapterCount; 
+      chapterNumber = currentBookDescriptor.chapterCount - 1; 
     } else {
       // do nothing
     }
     
-    chapterNumber = Math.max(chapterNumber, 1);
-    chapterNumber = Math.min(chapterNumber, currentBookDescriptor.chapterCount);
+    chapterNumber = Math.max(chapterNumber, 0);
+    chapterNumber = Math.min(chapterNumber, currentBookDescriptor.chapterCount - 1);
     $("#chapterToFetch").val(chapterNumber);
 
     handleFetchChapter();
@@ -115,22 +112,17 @@ var bookReader = function() {
 
   function displayChapter(chapterContent) {
     $('#readingAreaContainer').html(chapterContent);
-
-    displayChapterTitle();
-
+    
     // Align chapter number selector with new chapter
-    var chapterNumber = $('#chapterToFetch').val();
-    $("#chapterControlNumber").val(chapterNumber);
-  }
-
-  function displayChapterTitle() {
-    var title= $('#readingAreaContainer > h2:first').text();
-    $("#currentChapter").text(title);    
+    var chapterIndex = $('#chapterToFetch').val();
+    $("#chapterControlNumber").val(chapterIndex);
   }
 
   function getQueryParameter(parameterName) {
     var queryDict = {};
-    location.search.substr(1).split("&").forEach(function(item) {queryDict[item.split("=")[0]] = item.split("=")[1]});
+    location.search.substr(1).split("&").forEach(function(item) {
+      queryDict[item.split("=")[0]] = item.split("=")[1];
+    });
     return queryDict[parameterName];
   }
 

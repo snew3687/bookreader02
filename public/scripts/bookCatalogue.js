@@ -19,8 +19,7 @@ var bookCatalogue = function() {
     $(allBookDescriptors).each(function(index, item) {
       $list.append($(
         '<li>' +
-          '<a class="bookLink" href="bookReader/' + item.bookUri + '">' +
-//          '<a class="bookLink" href="#" data-bookUri="' + item.bookUri + '">' +
+          '<a class="bookLink" href="bookReader/' + item.bookUri + '"' +
             '<span class="authorName">' + item.Author + '</span>' +
             '&#45;' +
             '<span class="bookTitle">' + item.Title + '</span>' +

@@ -1,4 +1,9 @@
 
+Refactoring
+===========
++ bookServer.cloneDescriptorWithoutTitles: replace with better method of cloning (shallow) object: 
+  * Figure out why Object.create(null, objectWantToClone) did not create a shallow clone in nodejs ??
+
 Technical Ideas
 ============================================
 + Use Flexbox to layout

@@ -1,34 +1,47 @@
 
-div#mainSidePanelsBackground {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  width: 100%;
+html, body {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.flex-master {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+
+  height: 100%;
+  overflow: auto;
+}
+
+.sidePanel {
+  flex: 2 2 20%;
+
   background: lavender;
   background-image: url("/images/backgroundStar.png");
   background-repeat: repeat;
 }
 
+.pageContent {
+  flex: 6 6 60%;
+  max-width: 810px; 
+
+  /* New flex container for content */
+  display: flex;
+  flex-direction: column;
+  flex-wrap: no-wrap;
+}
+
 div#bookHeader {
-  position: fixed;
-  top: 0;
-  height: 78px;
-  left: 10%;
-  right: 10%;
+  flex: none; /* Fixed size */
   border-style: solid; 
   border-width: 1;
   border-color: gray;
   background: aliceblue;
-  z-index: 10;
-  max-width: 810px; /* Take into account the padding of #readingAreaContainer */
 }
 
 div#bookTitleContainer {
   display: inline;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 11;
 }
 
 #bookTitle {
@@ -37,10 +50,6 @@ div#bookTitleContainer {
 
 div#bookAuthor {
   display: inline;
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 11;
 }
 
 div#chapterControlContainer {
@@ -48,18 +57,6 @@ div#chapterControlContainer {
   border-width: 2;
   border-color: gray;
   background-color: lightsteelblue;
-  position: absolute;
-  top: 40px;
-  height: 30px;
-  left: 2px;
-  right: 2px;
-  z-index: 11;
-}
-
-div#currentChapter {
-  display: inline;
-  position: absolute;
-  right: 5px;
 }
 
 .chapterHeader {
@@ -67,13 +64,8 @@ div#currentChapter {
 }
 
 div#readingAreaContainer {
-  position: absolute;
-  top: 78px;
-  left: 10%;
-  right: 10%;
-  max-width: 800px;
-/* This overflow property worked well. But is it well supported on all browsers? */
-/*  overflow: scroll; */
+  flex: 1 1 auto;
+  overflow-y: scroll;
   background-color: white;
   border-style: solid; 
   border-width: 1;

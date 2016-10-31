@@ -59,11 +59,15 @@ div#chapterControlContainer {
   background-color: lightsteelblue;
 }
 
+.navHome {
+
+}
+
 .chapterHeader {
   font-weight: bold;
 }
 
-div#readingAreaContainer {
+.mainContentArea {
   flex: 1 1 auto;
   overflow-y: scroll;
   background-color: white;

@@ -4,22 +4,35 @@
     <title>Book Reader</title>
     <script src="scripts/jquery-1.12.3.js"></script>
     <script src="scripts/bookCatalogue.js"></script>
+    <link rel="stylesheet" href="stylesheets/bookReaderStyle.css" type="text/css" />
   </head>
   <body>
 
-    <div id="bookListContainer">
-      <h1>Book Catalogue</h1>
-      <ul> 
-        <li>
-          <a class="bookLink" href="#" data-bookUri="BOOK_URI_NOT_SPECIFIED">
-            <span class="authorName">AUTHOR TBA</span>
-            &#45;
-            <span class="bookTitle">BOOK TITLE TBA</span>
-          </a>
-        </li> 
-      </ul> 
-    </div> <!-- id="bookListContainer" -->
+    <div class="flex-master">
 
+      <div class="sidePanel">
+      </div>
+
+      <div class="pageContent">
+        <div id="bookListContainer" class="mainContentArea">
+          <h1>Book Catalogue</h1>
+          <ul> 
+            <li>
+              <a class="bookLink" href="#" data-bookUri="BOOK_URI_NOT_SPECIFIED">
+                <span class="authorName">AUTHOR TBA</span>
+                &#45;
+                <span class="bookTitle">BOOK TITLE TBA</span>
+              </a>
+            </li> 
+          </ul> 
+        </div> <!-- id="bookListContainer" -->
+
+      </div><!-- class="pageContent" -->
+
+      <div class="sidePanel">
+      </div>
+
+    </div><!-- class="flex-master" -->
   </body>
   <script>
     $(document).ready(function() {

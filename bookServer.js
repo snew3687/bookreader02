@@ -147,27 +147,10 @@ function parseAndLoadBook(fileContent) {
 
 function cloneDescriptorWithoutTitles(descriptor) {
     // Shallow clone the original, so as not to clear out the chapterTitles
-    try {
-      // Commented out - for some reason Object.create() does not work
-      //var clone = Object.create(null, descriptor); 
-      var clone = 
-      {
-        "bookUri": descriptor.bookUri,
-        "chapterCount": descriptor.chapterCount,
-        "chapterCounter": descriptor.chapterCounter,
-        "Title": descriptor.Title,
-        "Author": descriptor.Author,
-        "ReleaseDate": descriptor.ReleaseDate,
-        "Language": descriptor.Language
-      };
-
-      console.log("Cloned descriptor");
-      return clone;
-
-    } catch (ex) {
-      console.log("Exception occurred - " + e);
-      throw ex;
-    }
+    var clone = { };
+    Object.assign(clone, descriptor);
+    clone.chapterTitles = null;
+    return clone;
 }
 
 function getBookDescriptor(bookUri, isFetchChapterTitles) {

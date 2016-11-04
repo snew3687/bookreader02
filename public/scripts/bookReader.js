@@ -11,6 +11,9 @@ var bookReader = function() {
   // }
   var currentBookDescriptor = { };
   var currentBookUri = 'BOOK_URI_NOT_YET_ASSIGNED'; 
+  var chapterElements$ = null;
+  var firstDisplayedContentIndex = 0;
+  var nextDisplayedContentIndex = 0;
 
   var initialise = function initialise() {
     initialiseChapterControlHandlers();
@@ -27,6 +30,10 @@ var bookReader = function() {
       .on('click', { fetchType: 'next' }, handleChapterControl );
     $('#chapterControlLast')
       .on('click', { fetchType: 'last' }, handleChapterControl );
+    $('#pageControlPrevious')
+      .on('click', { fetchType: 'previous' }, handlePageControl );
+    $('#pageControlNext')
+      .on('click', { fetchType: 'next' }, handlePageControl );
   }
 
   function initialiseChapterNumberControl() {
@@ -92,6 +99,10 @@ var bookReader = function() {
       // do nothing
     }
     
+    fetchChapterNumber(chapterNumber);
+  }
+
+  function fetchChapterNumber(chapterNumber) {
     chapterNumber = Math.max(chapterNumber, 0);
     chapterNumber = Math.min(chapterNumber, currentBookDescriptor.chapterCount - 1);
     $("#chapterToFetch").val(chapterNumber);
@@ -111,11 +122,88 @@ var bookReader = function() {
   }
 
   function displayChapter(chapterContent) {
-    $('#readingAreaContainer').html(chapterContent);
+    chapterElements$ = $(chapterContent);
+    nextDisplayedContentIndex = 0;
+    displayAndFlowNextPage();
     
     // Align chapter number selector with new chapter
     var chapterIndex = $('#chapterToFetch').val();
     $("#chapterControlNumber").val(chapterIndex);
+  }
+
+  function handlePageControl(evt) {
+    evt.preventDefault();
+    var fetchType = evt.data.fetchType;
+
+    if (fetchType === 'previous') { 
+      displayPreviousPage();
+    }
+    else if (fetchType === 'next') { 
+      displayNextPage();
+    }
+  }
+
+  function displayPreviousPage() {
+    if (firstDisplayedContentIndex > 0) {
+      displayAndFlowPreviousPage();
+    } else {
+      var previousChapterNumber = Number($("#chapterToFetch").val()) - 1;
+      fetchChapterNumber(previousChapterNumber); 
+    }
+  }
+  function displayNextPage() {
+    if (nextDisplayedContentIndex < chapterElements$.length) {
+      displayAndFlowNextPage();
+    } else {
+      var nextChapterNumber = Number($("#chapterToFetch").val()) + 1;
+      fetchChapterNumber(nextChapterNumber); 
+    }
+  }
+
+  function displayAndFlowPreviousPage() {
+    var lastAddedElement = null;
+    $('#readingAreaContainer').empty();
+    if (firstDisplayedContentIndex <= 0) {
+      $('#readingAreaContainer').html('<p>No chapter content to display</p>');
+      return;
+    }
+
+    nextDisplayedContentIndex = firstDisplayedContentIndex;
+    for (var i = firstDisplayedContentIndex - 1; i >= 0; i--) {
+      lastAddedElement = chapterElements$[i];
+      $('#readingAreaContainer').prepend(lastAddedElement );
+
+      if (isReadingContainerLargerThanPage()) {
+        $(lastAddedElement).remove(); 
+      } else {
+        firstDisplayedContentIndex--;
+      }
+    }
+  }
+
+  function displayAndFlowNextPage() {
+    var lastAddedElement = null;
+    $('#readingAreaContainer').empty();
+    if (nextDisplayedContentIndex >= chapterElements$.length) {
+      $('#readingAreaContainer').html('<p>No chapter content to display</p>');
+      return;
+    }
+
+    firstDisplayedContentIndex = nextDisplayedContentIndex;
+    for (var i = nextDisplayedContentIndex; i < chapterElements$.length; i++) {
+      lastAddedElement = chapterElements$[i];
+      $('#readingAreaContainer').append(lastAddedElement );
+
+      if (isReadingContainerLargerThanPage()) {
+        $(lastAddedElement).remove(); 
+      } else {
+        nextDisplayedContentIndex++;
+      }
+    }
+  }
+
+  function isReadingContainerLargerThanPage() {
+    return $('#readingAreaContainer').prop('scrollHeight') > $('#readingAreaContainer').height();
   }
 
   function getQueryParameter(parameterName) {

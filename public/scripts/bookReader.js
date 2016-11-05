@@ -102,22 +102,29 @@ var bookReader = function() {
     fetchChapterNumber(chapterNumber);
   }
 
-  function fetchChapterNumber(chapterNumber) {
+  function fetchChapterNumber(chapterNumber, postFetchHandler) {
     chapterNumber = Math.max(chapterNumber, 0);
     chapterNumber = Math.min(chapterNumber, currentBookDescriptor.chapterCount - 1);
     $("#chapterToFetch").val(chapterNumber);
 
-    handleFetchChapter();
+    handleFetchChapter(postFetchHandler);
   }
 
-  function handleFetchChapter() {
+  function handleFetchChapter(postFetchHandler) {
     var nextChapter = $("#chapterToFetch").val();
+
+    var successHandler = function(chapterContent) {
+      displayChapter(chapterContent);
+      if (postFetchHandler) {
+        postFetchHandler();
+      }
+    };
 
     var fetchUrl = "books/" + currentBookUri + "/chapter/" + nextChapter;    
     $.ajax({
       url: fetchUrl,
       type: 'GET',
-      success: displayChapter
+      success: successHandler
     });
   }
 
@@ -143,16 +150,23 @@ var bookReader = function() {
     }
   }
 
+  // TODO: Need to set up an "on resize" event to reflow current page content
+
   function displayPreviousPage() {
-    if (firstDisplayedContentIndex > 0) {
+    if (!isAtFirstPageOfChapter()) {
       displayAndFlowPreviousPage();
     } else {
       var previousChapterNumber = Number($("#chapterToFetch").val()) - 1;
-      fetchChapterNumber(previousChapterNumber); 
+      fetchChapterNumber(previousChapterNumber,
+                         function() {
+                          while (!isAtLastPageOfChapter()) {
+                            displayNextPage();
+                          }
+                        });
     }
   }
   function displayNextPage() {
-    if (nextDisplayedContentIndex < chapterElements$.length) {
+    if (!isAtLastPageOfChapter()) {
       displayAndFlowNextPage();
     } else {
       var nextChapterNumber = Number($("#chapterToFetch").val()) + 1;
@@ -163,7 +177,7 @@ var bookReader = function() {
   function displayAndFlowPreviousPage() {
     var lastAddedElement = null;
     $('#readingAreaContainer').empty();
-    if (firstDisplayedContentIndex <= 0) {
+    if (isAtFirstPageOfChapter()) {
       $('#readingAreaContainer').html('<p>No chapter content to display</p>');
       return;
     }
@@ -175,6 +189,7 @@ var bookReader = function() {
 
       if (isReadingContainerLargerThanPage()) {
         $(lastAddedElement).remove(); 
+        break;
       } else {
         firstDisplayedContentIndex--;
       }
@@ -184,7 +199,7 @@ var bookReader = function() {
   function displayAndFlowNextPage() {
     var lastAddedElement = null;
     $('#readingAreaContainer').empty();
-    if (nextDisplayedContentIndex >= chapterElements$.length) {
+    if (isAtLastPageOfChapter()) {
       $('#readingAreaContainer').html('<p>No chapter content to display</p>');
       return;
     }
@@ -196,10 +211,19 @@ var bookReader = function() {
 
       if (isReadingContainerLargerThanPage()) {
         $(lastAddedElement).remove(); 
+        break;
       } else {
         nextDisplayedContentIndex++;
       }
     }
+  }
+
+  function isAtFirstPageOfChapter() {
+    return firstDisplayedContentIndex <= 0;
+  }
+
+  function isAtLastPageOfChapter() {
+    return nextDisplayedContentIndex >= chapterElements$.length;
   }
 
   function isReadingContainerLargerThanPage() {

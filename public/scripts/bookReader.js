@@ -18,7 +18,16 @@ var bookReader = function() {
   var initialise = function initialise() {
     initialiseChapterControlHandlers();
     initialiseForCurrentBook();
+// TODO - Figure out how to get resize-handling working
+    //initialiseSizingHandlers();
   };
+
+// TODO - Figure out how to get resize-handling working
+/****
+  function initialiseSizingHandlers() {
+    $(window).resize(handlePageContentResize);
+  }
+****/
 
   function initialiseChapterControlHandlers() {
     // First/Previous/Next/Last controls
@@ -53,7 +62,7 @@ var bookReader = function() {
 
   function handleChapterNumberControlChange() {
     var chapterNumber = $('#chapterControlNumber').val();
-    $("#chapterToFetch").val(chapterNumber);
+    $("#chapterToFetch").val(currentChapterIndex());
     handleFetchChapter();
   }
 
@@ -152,19 +161,28 @@ var bookReader = function() {
 
   // TODO: Need to set up an "on resize" event to reflow current page content
 
+  function currentChapterIndex() {
+    return Number($('#chapterControlNumber').val());
+  }
+
   function displayPreviousPage() {
     if (!isAtFirstPageOfChapter()) {
       displayAndFlowPreviousPage();
-    } else {
+    } else if (currentChapterIndex() === 0) {
+      return;
+    } 
+    else {
       var previousChapterNumber = Number($("#chapterToFetch").val()) - 1;
-      fetchChapterNumber(previousChapterNumber,
-                         function() {
-                          while (!isAtLastPageOfChapter()) {
-                            displayNextPage();
-                          }
-                        });
+      fetchChapterNumber(
+       previousChapterNumber,
+       function() {
+        while (!isAtLastPageOfChapter()) {
+          displayNextPage();
+        }
+       });
     }
   }
+
   function displayNextPage() {
     if (!isAtLastPageOfChapter()) {
       displayAndFlowNextPage();
@@ -182,7 +200,30 @@ var bookReader = function() {
       return;
     }
 
-    nextDisplayedContentIndex = firstDisplayedContentIndex;
+    addAsManyContentPreviousElementsAsCanFit(firstDisplayedContentIndex);
+  }
+
+  function displayAndFlowNextPage() {
+    var lastAddedElement = null;
+    $('#readingAreaContainer').empty();
+    if (isAtLastPageOfChapter()) {
+      $('#readingAreaContainer').html('<p>No chapter content to display</p>');
+      return;
+    }
+
+    addAsManyContentNextElementsAsCanFit(nextDisplayedContentIndex);
+  }
+
+// TODO - Figure out how to get resize-handling working
+/***
+  function handlePageContentResize() {
+    addAsManyContentNextElementsAsCanFit(firstDisplayedContentIndex);
+  }
+***/
+
+  function addAsManyContentPreviousElementsAsCanFit(startingContentIndex) {
+    nextDisplayedContentIndex = startingContentIndex;
+
     for (var i = firstDisplayedContentIndex - 1; i >= 0; i--) {
       lastAddedElement = chapterElements$[i];
       $('#readingAreaContainer').prepend(lastAddedElement );
@@ -196,15 +237,11 @@ var bookReader = function() {
     }
   }
 
-  function displayAndFlowNextPage() {
+  function addAsManyContentNextElementsAsCanFit(startingContentIndex) {
     var lastAddedElement = null;
-    $('#readingAreaContainer').empty();
-    if (isAtLastPageOfChapter()) {
-      $('#readingAreaContainer').html('<p>No chapter content to display</p>');
-      return;
-    }
 
-    firstDisplayedContentIndex = nextDisplayedContentIndex;
+    firstDisplayedContentIndex = startingContentIndex;
+
     for (var i = nextDisplayedContentIndex; i < chapterElements$.length; i++) {
       lastAddedElement = chapterElements$[i];
       $('#readingAreaContainer').append(lastAddedElement );

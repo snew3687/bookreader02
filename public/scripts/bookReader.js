@@ -18,16 +18,16 @@ var bookReader = function() {
   var initialise = function initialise() {
     initialiseChapterControlHandlers();
     initialiseForCurrentBook();
-// TODO - Figure out how to get resize-handling working
-    //initialiseSizingHandlers();
   };
 
-// TODO - Figure out how to get resize-handling working
-/****
   function initialiseSizingHandlers() {
     $(window).resize(handlePageContentResize);
+    var element = document.getElementById('readingAreaContainer');
+    new ResizeSensor(element, function() {
+      handlePageContentResize(element);
+      //console.log('Changed to ' + element.clientWidth);
+    });
   }
-****/
 
   function initialiseChapterControlHandlers() {
     // First/Previous/Next/Last controls
@@ -145,6 +145,8 @@ var bookReader = function() {
     // Align chapter number selector with new chapter
     var chapterIndex = $('#chapterToFetch').val();
     $("#chapterControlNumber").val(chapterIndex);
+
+    initialiseSizingHandlers();
   }
 
   function handlePageControl(evt) {
@@ -204,7 +206,6 @@ var bookReader = function() {
   }
 
   function displayAndFlowNextPage() {
-    var lastAddedElement = null;
     $('#readingAreaContainer').empty();
     if (isAtLastPageOfChapter()) {
       $('#readingAreaContainer').html('<p>No chapter content to display</p>');
@@ -214,12 +215,10 @@ var bookReader = function() {
     addAsManyContentNextElementsAsCanFit(nextDisplayedContentIndex);
   }
 
-// TODO - Figure out how to get resize-handling working
-/***
-  function handlePageContentResize() {
+  function handlePageContentResize(pageContentElement) {
+    $('#readingAreaContainer').empty();
     addAsManyContentNextElementsAsCanFit(firstDisplayedContentIndex);
   }
-***/
 
   function addAsManyContentPreviousElementsAsCanFit(startingContentIndex) {
     nextDisplayedContentIndex = startingContentIndex;
@@ -241,8 +240,9 @@ var bookReader = function() {
     var lastAddedElement = null;
 
     firstDisplayedContentIndex = startingContentIndex;
+    nextDisplayedContentIndex = startingContentIndex; 
 
-    for (var i = nextDisplayedContentIndex; i < chapterElements$.length; i++) {
+    for (var i = startingContentIndex; i < chapterElements$.length; i++) {
       lastAddedElement = chapterElements$[i];
       $('#readingAreaContainer').append(lastAddedElement );
 

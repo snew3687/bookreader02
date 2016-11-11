@@ -2,6 +2,8 @@ var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
+
+var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
@@ -19,19 +21,22 @@ bookServer.initialiseServer(
 
 
 
-
 app.use(express.static(path.join(__dirname, 'public')));
 
 /**** Commented out express default routes to pick up bookreader routes
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 ******/
+
+app.use(logger('dev'));
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.set('view engine', 'jade');
 
@@ -53,6 +58,16 @@ app.get('/books/all', function(request, response) {
   response
     .status(200)
     .send(allBookDescriptors);
+});
+
+app.post('/books/:bookUri/bookmark', function(request, response) {
+  var bookUri = request.params.bookUri;
+  var bookmarkDescriptor = bookServer.setBookmark(bookUri, request.body); // body will be a "bookmark descriptor"
+
+  response.type('json');
+  response
+    .status(200)
+    .send(bookmarkDescriptor);
 });
 
 // Get book descriptor
@@ -79,8 +94,6 @@ app.get('/books/:bookUri/chapter/:chapterNumber', function(request, response) {
     .status(200)
     .send(chapterContent);
 });
-
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

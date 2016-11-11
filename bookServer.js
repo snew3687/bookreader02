@@ -58,6 +58,7 @@ function loadBook(bookUri) {
   bookDescriptor.chapterCount = chapterSet.length;
   bookDescriptor.chapterTitles = determineChapterTitles(chapterSet);
   bookDescriptor.bookUri = bookUri;
+  bookDescriptor.bookmark = null;
 
   bookLibrary[bookUri] = new Book(bookDescriptor, chapterSet); 
 
@@ -80,6 +81,18 @@ function loadBookChapterSet(bookUri) {
   console.log('About to parse file data - ' + data.substring(0,50));
 
   return parseAndLoadBook(data);
+}
+
+function setBookmark(bookUri, bookmarkDescriptor) {
+  var bookDescriptor = getBookDescriptor(bookUri, true);
+  if (!bookDescriptor.bookmark) {
+    bookDescriptor.bookmark = { };  
+  }
+
+  bookDescriptor.bookmark.chapterIndex = Number(bookmarkDescriptor.chapterIndex);
+  bookDescriptor.bookmark.contentIndex = Number(bookmarkDescriptor.contentIndex);
+
+  return bookmarkDescriptor;
 }
 
 function determineChapterTitles(chapterSet) {
@@ -166,7 +179,8 @@ function getBookDescriptor(bookUri, isFetchChapterTitles) {
     "Last updated": null,
     "Language": "Unknown language",
     // Following properties added after initial load from file
-    chapterCount: 0 
+    chapterCount: 0, 
+    bookmark: null
   };
 
   if (loadBook(bookUri)) {
@@ -239,4 +253,4 @@ exports.getAllBookDescriptors = getAllBookDescriptors;
 exports.getBookDescriptor = getBookDescriptor;
 exports.getBookChapter = getBookChapter;
 exports.initialiseServer = initialiseServer;
-
+exports.setBookmark = setBookmark;

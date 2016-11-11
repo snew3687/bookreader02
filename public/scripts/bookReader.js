@@ -21,7 +21,7 @@ var bookReader = function() {
 
   
   var initialise = function initialise() {
-    initialiseChapterControlHandlers();
+    initialiseBookControlHandlers();
     initialiseForCurrentBook();
   };
 
@@ -29,7 +29,7 @@ var bookReader = function() {
     $(window).resize(handleWindowResize);
   }
 
-  function initialiseChapterControlHandlers() {
+  function initialiseBookControlHandlers() {
     // First/Previous/Next/Last controls
     $('#chapterControlFirst')
       .on('click', { fetchType: 'first' }, handleChapterControl );
@@ -43,6 +43,8 @@ var bookReader = function() {
       .on('click', { fetchType: 'previous' }, handlePageControl );
     $('#pageControlNext')
       .on('click', { fetchType: 'next' }, handlePageControl );
+    $('#bookmarkSet')
+      .on('click', handleSetBookmark );
   }
 
   function initialiseChapterNumberControl() {
@@ -69,10 +71,6 @@ var bookReader = function() {
   function initialiseForCurrentBook(evt) {
     currentBookUri = getQueryParameter('bookUri');
     loadBookInformation();
-
-    // Load first chapter
-    $('#chapterToFetch').val(0);
-    handleFetchChapter();
   }
 
   function loadBookInformation() {
@@ -89,6 +87,20 @@ var bookReader = function() {
     $('#bookTitle').text(currentBookDescriptor.Title);
     $('#bookAuthor').text(currentBookDescriptor.Author);
     initialiseChapterNumberControl();
+
+    if (currentBookDescriptor.bookmark) {
+      
+      handleFetchChapter();
+      fetchChapterNumber(currentBookDescriptor.bookmark.chapterIndex, function() {
+        nextDisplayedContentIndex = currentBookDescriptor.bookmark.contentIndex;
+        displayAndFlowNextPage(); 
+      });
+    } 
+    else { 
+      // Load first chapter
+      $('#chapterToFetch').val(0);
+      handleFetchChapter();
+    }
   }
 
   function handleChapterControl(evt) {
@@ -135,6 +147,29 @@ var bookReader = function() {
       type: 'GET',
       success: successHandler
     });
+  }
+
+  function handleSetBookmark(evt) {
+    evt.preventDefault();
+
+    var bookmarkSpecifier = {
+      chapterIndex: currentChapterIndex(),
+      contentIndex: firstDisplayedContentIndex 
+    };
+
+    var postUrl = "books/" + currentBookUri + "/bookmark";
+    var request = $.ajax({
+      url: postUrl,
+      method: "POST",
+      data: bookmarkSpecifier,
+      dataType: "json"
+    })
+    .done(handleSetBookmarkDone);
+
+  }
+
+  function handleSetBookmarkDone(bookmarkDescriptor) {
+    currentBookDescriptor.bookmark = bookmarkDescriptor;
   }
 
   function displayChapter(chapterContent) {

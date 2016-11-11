@@ -14,19 +14,19 @@ var bookReader = function() {
   var chapterElements$ = null;
   var firstDisplayedContentIndex = 0;
   var nextDisplayedContentIndex = 0;
+  var readingAreaPreviousSize = {
+      width: 0,
+      height: 0
+  };
 
+  
   var initialise = function initialise() {
     initialiseChapterControlHandlers();
     initialiseForCurrentBook();
   };
 
   function initialiseSizingHandlers() {
-    $(window).resize(handlePageContentResize);
-    var element = document.getElementById('readingAreaContainer');
-    new ResizeSensor(element, function() {
-      handlePageContentResize(element);
-      //console.log('Changed to ' + element.clientWidth);
-    });
+    $(window).resize(handleWindowResize);
   }
 
   function initialiseChapterControlHandlers() {
@@ -195,7 +195,6 @@ var bookReader = function() {
   }
 
   function displayAndFlowPreviousPage() {
-    var lastAddedElement = null;
     $('#readingAreaContainer').empty();
     if (isAtFirstPageOfChapter()) {
       $('#readingAreaContainer').html('<p>No chapter content to display</p>');
@@ -211,16 +210,38 @@ var bookReader = function() {
       $('#readingAreaContainer').html('<p>No chapter content to display</p>');
       return;
     }
+    firstDisplayedContentIndex = nextDisplayedContentIndex;
+    nextDisplayedContentIndex = firstDisplayedContentIndex; 
 
     addAsManyContentNextElementsAsCanFit(nextDisplayedContentIndex);
   }
 
-  function handlePageContentResize(pageContentElement) {
-    $('#readingAreaContainer').empty();
-    addAsManyContentNextElementsAsCanFit(firstDisplayedContentIndex);
+  function handleWindowResize() {
+    // TODO: Consider whether it is inefficient for this function to be called too often.
+    // Frequency of calls will depend on browser. Might be better to delay attempts to
+    // resize? Or use library like: http://marcj.github.io/css-element-queries/
+    var readingAreaElement$ = $('#readingAreaContainer');
+    if (isReadingAreaLargerNow(readingAreaElement$)) {
+      addAsManyContentNextElementsAsCanFit(nextDisplayedContentIndex);
+    } else {
+      removePageContentToFit();
+    }
+    saveReadingAreaSize();
+  }
+
+  function saveReadingAreaSize() {
+    var readingAreaElement$ = $('#readingAreaContainer');
+    readingAreaPreviousSize.width = readingAreaElement$.width();
+    readingAreaPreviousSize.height = readingAreaElement$.height();
+  }
+
+  function isReadingAreaLargerNow(readingAreaElement$) {
+    return readingAreaElement$.width() > readingAreaPreviousSize.width ||
+      readingAreaElement$.height() > readingAreaPreviousSize.height;
   }
 
   function addAsManyContentPreviousElementsAsCanFit(startingContentIndex) {
+    var lastAddedElement = null;
     nextDisplayedContentIndex = startingContentIndex;
 
     for (var i = firstDisplayedContentIndex - 1; i >= 0; i--) {
@@ -234,24 +255,38 @@ var bookReader = function() {
         firstDisplayedContentIndex--;
       }
     }
+    saveReadingAreaSize();
   }
 
-  function addAsManyContentNextElementsAsCanFit(startingContentIndex) {
+  function removePageContentToFit() {
     var lastAddedElement = null;
 
-    firstDisplayedContentIndex = startingContentIndex;
-    nextDisplayedContentIndex = startingContentIndex; 
+    while (isReadingContainerLargerThanPage()) {
+      lastAddedElement = chapterElements$[nextDisplayedContentIndex  - 1];
+      $(lastAddedElement).remove(); 
+      nextDisplayedContentIndex--;
+    }
+  }
 
+  
+
+  function addAsManyContentNextElementsAsCanFit(startingContentIndex) {
     for (var i = startingContentIndex; i < chapterElements$.length; i++) {
-      lastAddedElement = chapterElements$[i];
-      $('#readingAreaContainer').append(lastAddedElement );
+      tryIncrementPageContent();
+    }
+    saveReadingAreaSize();
+  }
 
-      if (isReadingContainerLargerThanPage()) {
-        $(lastAddedElement).remove(); 
-        break;
-      } else {
-        nextDisplayedContentIndex++;
-      }
+  function tryIncrementPageContent() {
+    var lastAddedElement = chapterElements$[nextDisplayedContentIndex];
+    $('#readingAreaContainer').append(lastAddedElement );
+
+    if (isReadingContainerLargerThanPage()) {
+      $(lastAddedElement).remove(); 
+      return false;
+    } else {
+      nextDisplayedContentIndex++;
+      return true;
     }
   }
 

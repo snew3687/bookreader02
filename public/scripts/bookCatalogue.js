@@ -1,20 +1,30 @@
 var bookCatalogue = function() {
 
   var initialise = function initialise() {
-    loadAllBookInformation();
+    loadTopRatedBookInformation();
+    loadBookmarkedBookInformation();
   };
  
-  function loadAllBookInformation() {
+  function loadTopRatedBookInformation() {
 
     $.ajax({
-      url: "books/all",
+      url: "books/toprated",
       type: 'GET',
-      success: listAllBookInformation
+      success: listTopRatedBookInformation
     });
   }
 
-  function listAllBookInformation(allBookDescriptors) {
-    var $list = $('div#bookListContainer > ul');
+  function loadBookmarkedBookInformation() {
+
+    $.ajax({
+      url: "books/bookmarked",
+      type: 'GET',
+      success: listBookmarkedBookInformation
+    });
+  }
+
+  function listTopRatedBookInformation(allBookDescriptors) {
+    var $list = $('div#topRatedBooksContainer > ul');
     $list.children().remove();
     $(allBookDescriptors).each(function(index, item) {
       $list.append($(
@@ -29,6 +39,21 @@ var bookCatalogue = function() {
     });
   }
 
+  function listBookmarkedBookInformation(allBookDescriptors) {
+    var $list = $('div#bookmarkedBooksContainer > ul');
+    $list.children().remove();
+    $(allBookDescriptors).each(function(index, item) {
+      $list.append($(
+        '<li>' +
+          '<a class="bookLink" href="bookReader/' + item.bookUri + '"' +
+            '<span class="authorName">' + item.Author + '</span>' +
+            '&#45;' +
+            '<span class="bookTitle">' + item.Title + '</span>' +
+          '</a>' +
+        '</li>' 
+      ));
+    });
+  }
   return {
     initialise: initialise
   };

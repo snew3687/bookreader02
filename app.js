@@ -51,14 +51,35 @@ app.get('/bookReader/:bookUri', function(request, response) {
 
 // Get all book descriptors
 app.get('/books/all', function(request, response) {
-  var bookUri = request.params.bookUri;
-  var allBookDescriptors = bookServer.getAllBookDescriptors();
+  var bookDescriptors = bookServer.getAllBookDescriptors();
 
   response.type('json');
   response
     .status(200)
-    .send(allBookDescriptors);
+    .send(bookDescriptors);
 });
+
+// Get top-rated book descriptors
+app.get('/books/toprated', function(request, response) {
+  var bookDescriptors = bookServer.getTopRatedBookDescriptors();
+
+  response.type('json');
+  response
+    .status(200)
+    .send(bookDescriptors);
+});
+
+
+// Get top-rated book descriptors
+app.get('/books/bookmarked', function(request, response) {
+  var bookDescriptors = bookServer.getBookmarkedBookDescriptors();
+
+  response.type('json');
+  response
+    .status(200)
+    .send(bookDescriptors);
+});
+
 
 app.post('/books/:bookUri/bookmark', function(request, response) {
   var bookUri = request.params.bookUri;

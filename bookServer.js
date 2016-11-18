@@ -13,12 +13,62 @@ function initialiseServer(options) {
     booksDocRoot = options.booksDocRoot;
   }
   loadBookMetaData();
+  initialiseRatingData();
+  initialiseBookmarks();
 }  
+
+function initialiseBookmarks() {
+  // This bookmark information is hard-coded to supply some data for display
+
+  bookLibrary['JaneAusten_PrideAndPrejudice'].descriptor.bookmark = { 'chapterIndex' : 5, 'contentIndex': 0 };
+  bookLibrary['LewisCarroll_AlicesAdventuresInWonderland'].descriptor.bookmark = { 'chapterIndex' : 7, 'contentIndex': 0 };
+}
 
 function loadBookMetaData() {
   _.each(getBookDirectoryNames(), loadBook);
 }
- 
+
+function initialiseRatingData() {
+  // This rating information is hard-coded to supply some data for display
+
+  _.each(bookLibrary, function(book) { book.descriptor.rating = 1 }); // Apply a default for all
+
+  // These are the "top rated" books
+  bookLibrary['BramStoker_Dracula'].descriptor.rating = 5;
+  bookLibrary['LewisCarroll_AlicesAdventuresInWonderland'].descriptor.rating = 4;
+  bookLibrary['MarkTwain_AdventuresOfHuckleberryFinn'].descriptor.rating = 4;
+  bookLibrary['RudyardKipling_TheJungleBook'].descriptor.rating = 3;
+}
+
+function getBookmarkedBookDescriptors() {
+  return _.chain(bookLibrary)
+        .map('descriptor')
+        .filter(function(descriptor) {
+          var bookmark = descriptor.bookmark;
+          return _.isObjectLike(bookmark) 
+              && _.isNumber(bookmark.chapterIndex)
+              && _.isNumber(bookmark.contentIndex)
+              && bookmark.chapterIndex >= 0
+              && bookmark.contentIndex >= 0
+        })
+        .map(function(descriptor) { return cloneDescriptorWithoutTitles(descriptor) })
+        .value();
+}
+
+function getTopRatedBookDescriptors(maxNumber) {
+  if (!maxNumber) {
+    maxNumber = 4;
+  }
+
+  return _.chain(bookLibrary)
+        .map('descriptor')
+        .map(function(descriptor) { return cloneDescriptorWithoutTitles(descriptor) })
+        .sortBy('rating')
+        .reverse()
+        .take(maxNumber)
+        .value();
+}
+
 function getBookDirectoryNames() {
   var result = [];
   var files = fs.readdirSync(booksDocRoot);
@@ -218,6 +268,8 @@ function getAllBookDescriptors() {
 }
 
 exports.getAllBookDescriptors = getAllBookDescriptors;
+exports.getTopRatedBookDescriptors = getTopRatedBookDescriptors;
+exports.getBookmarkedBookDescriptors = getBookmarkedBookDescriptors; 
 exports.getBookDescriptor = getBookDescriptor;
 exports.getBookChapter = getBookChapter;
 exports.initialiseServer = initialiseServer;

@@ -63,19 +63,14 @@ function loadBook(bookUri) {
 
 function loadBookDescriptor(bookUri) {
   var filepath = booksDocRoot + '\\' + bookUri + '\\bookDescriptor.json';
-  console.log('Start - Read book descriptor from - ' + filepath);
   var data = fs.readFileSync(filepath, 'utf8');
   var descriptor = JSON.parse(data);
-  console.log('End - Read book descriptor ' + JSON.stringify(descriptor));
   return descriptor;
 }
 
 function loadBookChapterSet(bookUri) {
   var filepath = booksDocRoot + '\\' + bookUri + '\\bookChapters.md';
-  console.log('About to read file - ' + filepath);
   var data = fs.readFileSync(filepath, 'utf8');
-  console.log('About to parse file data - ' + data.substring(0,50));
-
   return parseAndLoadBook(data);
 }
 
@@ -92,19 +87,13 @@ function setBookmark(bookUri, bookmarkDescriptor) {
 }
 
 function determineChapterTitles(chapterSet) {
-  var chapterTitleDescriptors = [];
-  var chapterTitleDescriptor = null;
-  var chapterDisplayIndex;
-  var title;
-
-  
-  for (var chapterIndex = 0; chapterIndex < chapterSet.length; chapterIndex++) {
-    chapterDisplayIndex = chapterIndex; // TODO - extend this to include non-zero-based, Roman numerals, etc.
-    title = determineHeadingText(chapterSet[chapterIndex].chapterHeading);
-    chapterTitleDescriptor = new ChapterTitleDescriptor(chapterIndex, chapterDisplayIndex, title); 
-    chapterTitleDescriptors.push(chapterTitleDescriptor);
-  }
-  return chapterTitleDescriptors;
+  return _.map(chapterSet, function(chapter, chapterIndex) {
+    return new ChapterTitleDescriptor(
+      chapterIndex,
+      chapterIndex, // TODO - extend this "displayIndex" to include non-zero-based, Roman numerals, etc.
+      determineHeadingText(chapter.chapterHeading)
+    );
+  });
 }
 
 function determineHeadingText(headingNode) {
@@ -156,10 +145,7 @@ function parseAndLoadBook(fileContent) {
 
 function cloneDescriptorWithoutTitles(descriptor) {
     // Shallow clone the original, so as not to clear out the chapterTitles
-    var clone = { };
-    Object.assign(clone, descriptor);
-    clone.chapterTitles = null;
-    return clone;
+    return _.omit(descriptor, 'chapterTitles');
 }
 
 function getBookDescriptor(bookUri, isFetchChapterTitles) {
@@ -168,6 +154,7 @@ function getBookDescriptor(bookUri, isFetchChapterTitles) {
   var book;
   var result = 
   {
+    // These following properties should be loaded from book descriptor
     "Title": "Unknown book",
     "Author": "Unknown Author",
     "Posting Date": null,
@@ -180,8 +167,7 @@ function getBookDescriptor(bookUri, isFetchChapterTitles) {
   };
 
   if (loadBook(bookUri)) {
-    result = bookLibrary[bookUri].descriptor;
-    result.chapterCounter = 0;
+    _.assign(result, bookLibrary[bookUri].descriptor);
   }
 
   if (result.chapterTitles) {
@@ -193,7 +179,7 @@ function getBookDescriptor(bookUri, isFetchChapterTitles) {
   // Chapter titles are loaded into the descriptor by default. But
   // don't return them if they are not needed
   if (!isFetchChapterTitles) {
-    result = cloneDescriptorWithoutTitles(result); 
+    result = cloneDescriptorWithoutTitles(result);
   }
   return result;
 }
@@ -215,34 +201,20 @@ function getBookChapter(bookUri, chapterIndex) {
     // Render chapter heading
     result = writer.render(chapterEntry.chapterHeading);
 
-    // Render all chapter paragraphs
-    var i = 0;
-    var textNode;
-    for (var nodeIndex in chapterEntry.chapterTextNodes)
-    {
-      textNode = chapterEntry.chapterTextNodes[nodeIndex];
-      result += writer.render(chapterEntry.chapterTextNodes[nodeIndex]);
-      i++;
-    }
-  } 
+    var renderedTextNodes = 
+      _.map(chapterEntry.chapterTextNodes, function(textNode) {
+        return writer.render(textNode)
+      }).join(''); 
 
+    result += renderedTextNodes
+  }
   return result;
 }
 
 function getAllBookDescriptors() {
-  var result = [];
-  var bookUri = '';
-  var nextDescriptor;
-
-  console.log("Invoking getAllBookDescriptors()...");
-  for (bookUri in bookLibrary) {
-    // Chapter titles are loaded into the descriptor by default. But
-    // don't return them if they are not needed
-    console.log("Fetching book with URI - " + bookUri);
-    nextDescriptor = cloneDescriptorWithoutTitles(bookLibrary[bookUri].descriptor);
-    result.push(nextDescriptor);
-  }
-  return result;
+  return _.map(bookLibrary, function(book) {
+    return cloneDescriptorWithoutTitles(book.descriptor)
+  });
 }
 
 exports.getAllBookDescriptors = getAllBookDescriptors;

@@ -330,12 +330,27 @@ var bookReader = function() {
   }
 
   function getQueryParameter(parameterName) {
-    var queryDict = {};
-    location.search.substr(1).split("&").forEach(function(item) {
-      queryDict[item.split("=")[0]] = item.split("=")[1];
-    });
-    return queryDict[parameterName];
+    return getAllQueryParameters()[parameterName];
   }
+
+  function getAllQueryParameters(queryString) {
+    // Function taken from: https://gist.github.com/ryoppy/5780748
+
+    var query = (queryString || window.location.search).substring(1); // delete ? 
+    if (!query) {
+      return false;
+    }
+    return _
+      .chain(query.split('&'))
+      .map(function (params) {
+        var p = params.split('=');
+        return [p[0], decodeURIComponent(p[1])];
+      })
+      .fromPairs()
+      .value();
+  }   
+
+  
 
   return {
     initialise: initialise

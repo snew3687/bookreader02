@@ -4617,7 +4617,7 @@ the heart of the Garo hills!
         Mahadeo!  Mahadeo!  He made all,...
         Thorn for the camel, fodder for the kine,
         And mother's heart for sleepy head, O little son of mine!
-
+<br />
 
      Wheat he gave to rich folk, millet to the poor,
      Broken scraps for holy men that beg from door to door;
@@ -4631,6 +4631,7 @@ the heart of the Garo hills!
         Mahadeo!  Mahadeo!  Turn and see.
         Tall are the camels, heavy are the kine,
         But this was Least of Little Things, O little son of mine!
+<br />
 
      When the dole was ended, laughingly she said,
      "Master, of a million mouths, is not one unfed?"

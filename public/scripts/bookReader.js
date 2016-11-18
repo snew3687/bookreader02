@@ -26,7 +26,8 @@ var bookReader = function() {
   };
 
   function initialiseSizingHandlers() {
-    $(window).resize(handleWindowResize);
+    // debounce to ensure that resize logic is not invoked onerously
+    $(window).on('resize', _.debounce(handleWindowResize, 200));
   }
 
   function initialiseBookControlHandlers() {
@@ -52,7 +53,7 @@ var bookReader = function() {
     $('#chapterControlNumber').unbind('change');
     $('#chapterControlNumber').children().remove();
 
-    $.each(currentBookDescriptor.chapterTitles, function (i, titleDescriptor) {
+    _.each(currentBookDescriptor.chapterTitles, function (titleDescriptor) {
         $('#chapterControlNumber').append($('<option>', { 
             value: titleDescriptor.chapterIndex,
             text : titleDescriptor.titleText
@@ -74,7 +75,6 @@ var bookReader = function() {
   }
 
   function loadBookInformation() {
-
     $.ajax({
       url: "books/" + currentBookUri + "?chapterTitles=true",
       type: 'GET',
@@ -108,16 +108,11 @@ var bookReader = function() {
 
     var fetchType = evt.data.fetchType;
     var chapterNumber = Number($("#chapterToFetch").val());
-    if (fetchType === 'first') {
-      chapterNumber = 0;
-    } else if (fetchType === 'previous') { 
-      chapterNumber -= 1;
-    } else if (fetchType === 'next') { 
-      chapterNumber += 1;
-    } else if (fetchType === 'last') { 
-      chapterNumber = currentBookDescriptor.chapterCount - 1; 
-    } else {
-      // do nothing
+    switch (fetchType) {
+      case 'first':     chapterNumber = 0; break;
+      case 'previous':  chapterNumber -= 1; break;
+      case 'next':      chapterNumber += 1; break;
+      case 'last':      chapterNumber = currentBookDescriptor.chapterCount - 1; break;
     }
     
     fetchChapterNumber(chapterNumber);
@@ -252,9 +247,6 @@ var bookReader = function() {
   }
 
   function handleWindowResize() {
-    // TODO: Consider whether it is inefficient for this function to be called too often.
-    // Frequency of calls will depend on browser. Might be better to delay attempts to
-    // resize? Or use library like: http://marcj.github.io/css-element-queries/
     var readingAreaElement$ = $('#readingAreaContainer');
     if (isReadingAreaLargerNow(readingAreaElement$)) {
       addAsManyContentNextElementsAsCanFit(nextDisplayedContentIndex);

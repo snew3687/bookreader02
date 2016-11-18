@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var fs = require('fs');
 var commonmark = require('commonmark');
 var reader = new commonmark.Parser();
@@ -15,27 +16,20 @@ function initialiseServer(options) {
 }  
 
 function loadBookMetaData() {
-  forEachBookDirectory(loadBook);
+  _.each(getBookDirectoryNames(), loadBook);
 }
-
-function forEachBookDirectory(callback) {
-  var directoryName = 'NOT_INITIALISED';
-  var fileObject;
  
-  console.log('forEachBookDirectory(): Loading book directories from ' + booksDocRoot + ' ...');
+function getBookDirectoryNames() {
+  var result = [];
   var files = fs.readdirSync(booksDocRoot);
-  for (var index in files) {
-    directoryName = files[index];
-    fileObject = fs.statSync(booksDocRoot + '\\' + directoryName);
+  _.each(files, function(directoryName) {
+    var fileObject = fs.statSync(booksDocRoot + '\\' + directoryName);
     if (fileObject.isDirectory()) {
-      console.log('Invoking callback on: ' + directoryName);
-      callback(directoryName);
-    } else {
-      console.log('Skipping: ' + directoryName);
+      result.push(directoryName);
     }
-  }
+  });
 
-  console.log("forEachBookDirectory(): Loaded book directories.");
+  return result;
 }
 
 function ChapterTitleDescriptor(chapterIndex, chapterDisplayIndex, titleText) {
@@ -53,6 +47,8 @@ function Book(descriptor, chapterSet)
 function loadBook(bookUri) {
   if (bookLibrary[bookUri]) return bookLibrary[bookUri];
 
+  console.log('-----------------');
+  console.log('Loading book for URI: ' + bookUri);
   var chapterSet = loadBookChapterSet(bookUri);
   var bookDescriptor = loadBookDescriptor(bookUri); 
   bookDescriptor.chapterCount = chapterSet.length;

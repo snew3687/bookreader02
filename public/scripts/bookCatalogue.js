@@ -1,10 +1,19 @@
 var bookCatalogue = function() {
 
-  var initialise = function initialise() {
+  var li_a_bookmarkedBookRenderer = null;
+  var li_a_topRatedBookRenderer = null;
+  
+var initialise = function initialise() {
+    initialiseTemplates();
     loadTopRatedBookInformation();
     loadBookmarkedBookInformation();
   };
  
+  function initialiseTemplates() {
+    li_a_bookmarkedBookRenderer = _.template($('#li-a-bookmarkedBook').html());
+    li_a_topRatedBookRenderer = _.template($('#li-a-topRatedBook').html());
+  }
+
   function loadTopRatedBookInformation() {
 
     $.ajax({
@@ -23,35 +32,30 @@ var bookCatalogue = function() {
     });
   }
 
-  function listTopRatedBookInformation(allBookDescriptors) {
+  function listTopRatedBookInformation(bookDescriptors) {
     var $list = $('div#topRatedBooksContainer > ul');
     $list.children().remove();
-    $(allBookDescriptors).each(function(index, item) {
-      $list.append($(
-        '<li>' +
-          '<a class="bookLink" href="bookReader/' + item.bookUri + '"' +
-            '<span class="authorName">' + item.Author + '</span>' +
-            '&#45;' +
-            '<span class="bookTitle">' + item.Title + '</span>' +
-          '</a>' +
-        '</li>' 
-      ));
+    $(bookDescriptors).each(function(index, item) {
+      var rendered = li_a_topRatedBookRenderer({
+                      'bookUri': item.bookUri, 
+                      'author': item.Author, 
+                      'title': item.Title
+                    });
+      $list.append($(rendered));
     });
   }
 
-  function listBookmarkedBookInformation(allBookDescriptors) {
+  function listBookmarkedBookInformation(bookDescriptors) {
     var $list = $('div#bookmarkedBooksContainer > ul');
     $list.children().remove();
-    $(allBookDescriptors).each(function(index, item) {
-      $list.append($(
-        '<li>' +
-          '<a class="bookLink" href="bookReader/' + item.bookUri + '"' +
-            '<span class="authorName">' + item.Author + '</span>' +
-            '&#45;' +
-            '<span class="bookTitle">' + item.Title + '</span>' +
-          '</a>' +
-        '</li>' 
-      ));
+    $(bookDescriptors).each(function(index, item) {
+      var rendered = li_a_bookmarkedBookRenderer({
+                      'bookUri': item.bookUri, 
+                      'author': item.Author, 
+                      'title': item.Title,
+                      'chapterNumber': (item.bookmark.chapterIndex + 1)
+                    });
+      $list.append($(rendered));
     });
   }
   return {

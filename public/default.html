@@ -3,7 +3,11 @@
   <head>
     <title>Book Reader</title>
     <script src="scripts/jquery-1.12.3.js"></script>
+    <script src="scripts/lodash.js"></script>
     <script src="scripts/bookCatalogue.js"></script>
+    
+  
+
     <link rel="stylesheet" href="stylesheets/bookReaderStyle.css" type="text/css" />
   </head>
   <body>
@@ -17,25 +21,33 @@
         <div id="bookmarkedBooksContainer" class="mainContentArea">
           <h1>Bookmarked</h1>
           <ul> 
-            <li>
-              <a class="bookLink" href="#" data-bookUri="BOOK_URI_NOT_SPECIFIED">
-                <span class="authorName">AUTHOR TBA</span>
-                &#45;
-                <span class="bookTitle">BOOK TITLE TBA</span>
-              </a>
-            </li> 
+            <!-- lodash templated -->
+            <script id="li-a-bookmarkedBook" type="text/template">
+              <li>
+                <a class="bookLink" href="bookReader/<%= bookUri %>">
+                  <span class="authorName"><%= author %></span>
+                  &#45;
+                  <span class="bookTitle"><%= title %></span>
+                  &nbsp;
+                  <span class="bookmarkedChapter">&#40;Chapter <%= chapterNumber %>&#41;</span>
+                </a>
+              </li> 
+            </script>
           </ul> 
         </div> <!-- id="bookmarkedBooksContainer" -->
         <div id="topRatedBooksContainer" class="mainContentArea">
           <h1>Top Rated</h1>
           <ul> 
-            <li>
-              <a class="bookLink" href="#" data-bookUri="BOOK_URI_NOT_SPECIFIED">
-                <span class="authorName">AUTHOR TBA</span>
-                &#45;
-                <span class="bookTitle">BOOK TITLE TBA</span>
-              </a>
-            </li> 
+            <!-- lodash templated -->
+            <script id="li-a-topRatedBook" type="text/template">
+              <li>
+                <a class="bookLink" href="bookReader/<%= bookUri %>">
+                  <span class="authorName"><%= author %></span>
+                  &#45;
+                  <span class="bookTitle"><%= title %></span>
+                </a>
+              </li> 
+            </script>
           </ul> 
         </div> <!-- id="topRatedBooksContainer" -->
 
@@ -58,7 +70,10 @@
       </div>
 
     </div><!-- class="flex-master" -->
+
+
   </body>
+    
   <script>
     $(document).ready(function() {
       bookCatalogue.initialise();

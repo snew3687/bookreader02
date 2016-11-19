@@ -91,6 +91,15 @@ app.post('/books/:bookUri/bookmark', function(request, response) {
     .send(bookmarkDescriptor);
 });
 
+app.post('/books/:bookUri/rating', function(request, response) {
+  var bookUri = request.params.bookUri;
+  var newRating = request.query.ratingNumber;
+  bookServer.setRating(bookUri, newRating);
+
+  response
+    .status(200);
+});
+
 // Get book descriptor
 app.get('/books/:bookUri', function(request, response) {
   var bookUri = request.params.bookUri;

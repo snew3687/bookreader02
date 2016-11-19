@@ -31,7 +31,7 @@ function loadBookMetaData() {
 function initialiseRatingData() {
   // This rating information is hard-coded to supply some data for display
 
-  _.each(bookLibrary, function(book) { book.descriptor.rating = 1 }); // Apply a default for all
+  _.each(bookLibrary, function(book) { book.descriptor.rating = 0 }); // Apply a default for all
 
   // These are the "top rated" books
   bookLibrary['BramStoker_Dracula'].descriptor.rating = 5;
@@ -134,6 +134,14 @@ function setBookmark(bookUri, bookmarkDescriptor) {
   bookDescriptor.bookmark.contentIndex = Number(bookmarkDescriptor.contentIndex);
 
   return bookmarkDescriptor;
+}
+
+function setRating(bookUri, newRating) {
+  if (bookLibrary[bookUri]) {
+    bookLibrary[bookUri].descriptor.rating = newRating;
+  } else {
+    console.log('Canot set rating. Book not found for URI: ' + bookUri);
+  }
 }
 
 function determineChapterTitles(chapterSet) {
@@ -274,3 +282,4 @@ exports.getBookDescriptor = getBookDescriptor;
 exports.getBookChapter = getBookChapter;
 exports.initialiseServer = initialiseServer;
 exports.setBookmark = setBookmark;
+exports.setRating = setRating;

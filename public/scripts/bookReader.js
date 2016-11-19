@@ -21,8 +21,8 @@ var bookReader = function() {
 
   
   var initialise = function initialise() {
-    initialiseBookControlHandlers();
-    initialiseForCurrentBook();
+    initialiseToolbarControls();
+    initialiseReaderForCurrentBook();
   };
 
   function initialiseSizingHandlers() {
@@ -30,7 +30,7 @@ var bookReader = function() {
     $(window).on('resize', _.debounce(handleWindowResize, 200));
   }
 
-  function initialiseBookControlHandlers() {
+  function initialiseToolbarControls() {
     // First/Previous/Next/Last controls
     $('#chapterControlFirst')
       .on('click', { fetchType: 'first' }, handleChapterControl );
@@ -46,6 +46,17 @@ var bookReader = function() {
       .on('click', { fetchType: 'next' }, handlePageControl );
     $('#bookmarkSet')
       .on('click', handleSetBookmark );
+  }
+
+  function initialiseRatingControl(bookDescriptor) {
+
+    $('#bookRatingSelector').unbind('change');
+    var rating = _.isNumber(bookDescriptor.rating) && bookDescriptor.rating >= 0 && bookDescriptor.rating <= 5 ?
+      bookDescriptor.rating : 0;
+
+    $('#bookRatingSelector').val(rating);
+    
+    $('#bookRatingSelector').bind('change', handleRatingChange);
   }
 
   function initialiseChapterNumberControl() {
@@ -69,7 +80,7 @@ var bookReader = function() {
     handleFetchChapter();
   }
 
-  function initialiseForCurrentBook(evt) {
+  function initialiseReaderForCurrentBook(evt) {
     currentBookUri = getQueryParameter('bookUri');
     loadBookInformation();
   }
@@ -87,6 +98,7 @@ var bookReader = function() {
     $('#bookTitle').text(currentBookDescriptor.Title);
     $('#bookAuthor').text(currentBookDescriptor.Author);
     initialiseChapterNumberControl();
+    initialiseRatingControl(currentBookDescriptor);
 
     if (currentBookDescriptor.bookmark) {
       
@@ -162,6 +174,17 @@ var bookReader = function() {
     .done(handleSetBookmarkDone);
 
   }
+
+  function handleRatingChange() {
+    var newRating = $('#bookRatingSelector').val();
+
+    var postUrl = "books/" + currentBookUri + "/rating?ratingNumber=" + newRating;
+    var request = $.ajax({
+      url: postUrl,
+      method: "POST"
+    });
+  }
+
 
   function handleSetBookmarkDone(bookmarkDescriptor) {
     currentBookDescriptor.bookmark = bookmarkDescriptor;

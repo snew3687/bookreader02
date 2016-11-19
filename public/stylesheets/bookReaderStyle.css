@@ -44,6 +44,10 @@ div#bookTitleContainer {
   display: inline;
 }
 
+div#ratingSelectionContainer {
+  display: inline;
+}
+
 /* These controls are probably redundant now. Hidden until they are removed */
 a.chapterControl {
   display : none;

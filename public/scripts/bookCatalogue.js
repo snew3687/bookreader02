@@ -39,7 +39,8 @@ var initialise = function initialise() {
       var rendered = li_a_topRatedBookRenderer({
                       'bookUri': item.bookUri, 
                       'author': item.Author, 
-                      'title': item.Title
+                      'title': item.Title,
+                      'rating': item.rating
                     });
       $list.append($(rendered));
     });

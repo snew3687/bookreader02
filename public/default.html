@@ -45,6 +45,7 @@
                   <span class="authorName"><%= author %></span>
                   &#45;
                   <span class="bookTitle"><%= title %></span>
+                  <% _.each(_.range(rating), function() { %><img class="ratingStar" src="images\rating-star.png" /><% }); %>
                 </a>
               </li> 
             </script>

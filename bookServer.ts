@@ -1,6 +1,7 @@
-var _ = require('lodash');
-var fs = require('fs');
-var commonmark = require('commonmark');
+import * as _ from "lodash";
+import * as fs from "fs";
+import * as commonmark from "commonmark";
+
 var reader = new commonmark.Parser();
 var writer = new commonmark.HtmlRenderer();
 

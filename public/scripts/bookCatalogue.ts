@@ -1,3 +1,5 @@
+/// <reference path="../../typings/globals/jquery/index.d.ts" />
+
 var bookCatalogue = function() {
 
   var li_a_bookmarkedBookRenderer = null;

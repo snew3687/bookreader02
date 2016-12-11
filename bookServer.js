@@ -1,6 +1,10 @@
-var _ = require('lodash');
-var fs = require('fs');
-var commonmark = require('commonmark');
+"use strict";
+var _ = require("lodash");
+var fs = require("fs");
+var commonmark = require("commonmark");
+//var _ = require('lodash');
+//var fs = require('fs');
+//var commonmark = require('commonmark');
 var reader = new commonmark.Parser();
 var writer = new commonmark.HtmlRenderer();
 var booksDocRoot = 'BOOKS_DOC_ROOT_NOT_INITIALISED';

@@ -6,9 +6,56 @@ var reader = new commonmark.Parser();
 var writer = new commonmark.HtmlRenderer();
 
 var booksDocRoot = 'BOOKS_DOC_ROOT_NOT_INITIALISED';
-var bookLibrary = { };
 
-function initialiseServer(options) {
+interface IBookLibrary<T> {
+  [K : string] : T
+}
+
+
+var bookLibrary : IBookLibrary<Book> = {};
+
+class BookMark {
+  constructor (public chapterIndex? : number, public contentIndex? : number) {
+
+  }
+}
+
+class ChapterEntry {
+  constructor (public chapterHeading: commonmark.Node, public chapterTextNodes: commonmark.Node[]) {
+
+  }
+}
+
+class ChapterTitleDescriptor {
+
+  constructor (
+    public chapterIndex : number,
+    public chapterDisplayIndex : number, 
+    public titleText : string) {
+      
+  }
+}
+
+class BookDescriptor {
+	Title : string;
+	Author : string;
+	ReleaseDate : string;
+	Language : string;
+  chapterCount : number;
+  chapterTitles : ChapterTitleDescriptor[];
+  bookUri : string;
+  bookmark : BookMark;
+  rating : number;
+}  
+
+class Book {
+
+  constructor(public descriptor : BookDescriptor, public chapterSet : ChapterEntry[]) {
+  }
+}
+
+
+function initialiseServer(options) : void {
 
   if (options.booksDocRoot) {
     booksDocRoot = options.booksDocRoot;
@@ -18,21 +65,21 @@ function initialiseServer(options) {
   initialiseBookmarks();
 }  
 
-function initialiseBookmarks() {
+function initialiseBookmarks() : void {
   // This bookmark information is hard-coded to supply some data for display
 
-  bookLibrary['JaneAusten_PrideAndPrejudice'].descriptor.bookmark = { 'chapterIndex' : 5, 'contentIndex': 0 };
-  bookLibrary['LewisCarroll_AlicesAdventuresInWonderland'].descriptor.bookmark = { 'chapterIndex' : 7, 'contentIndex': 0 };
+  bookLibrary['JaneAusten_PrideAndPrejudice'].descriptor.bookmark = new BookMark(5, 0 );
+  bookLibrary['LewisCarroll_AlicesAdventuresInWonderland'].descriptor.bookmark = new BookMark(7, 0 );
 }
 
-function loadBookMetaData() {
+function loadBookMetaData() : void {
   _.each(getBookDirectoryNames(), loadBook);
 }
 
-function initialiseRatingData() {
+function initialiseRatingData() : void {
   // This rating information is hard-coded to supply some data for display
 
-  _.each(bookLibrary, function(book) { book.descriptor.rating = 0 }); // Apply a default for all
+  _.each(bookLibrary, function(book : Book) { book.descriptor.rating = 0 }); // Apply a default for all
 
   // These are the "top rated" books
   bookLibrary['BramStoker_Dracula'].descriptor.rating = 5;
@@ -41,18 +88,18 @@ function initialiseRatingData() {
   bookLibrary['RudyardKipling_TheJungleBook'].descriptor.rating = 3;
 }
 
-function getBookmarkedBookDescriptors() {
+function getBookmarkedBookDescriptors() : BookDescriptor[] {
   return _.chain(bookLibrary)
         .map('descriptor')
-        .filter(function(descriptor) {
-          var bookmark = descriptor.bookmark;
+        .filter(function(descriptor : BookDescriptor) {
+          var bookmark  = descriptor.bookmark;
           return _.isObjectLike(bookmark) 
               && _.isNumber(bookmark.chapterIndex)
               && _.isNumber(bookmark.contentIndex)
               && bookmark.chapterIndex >= 0
               && bookmark.contentIndex >= 0
         })
-        .map(function(descriptor) { return cloneDescriptorWithoutTitles(descriptor) })
+        .map(function(descriptor : BookDescriptor) { return cloneDescriptorWithoutTitles(descriptor) })
         .value();
 }
 
@@ -63,14 +110,14 @@ function getTopRatedBookDescriptors(maxNumber) {
 
   return _.chain(bookLibrary)
         .map('descriptor')
-        .map(function(descriptor) { return cloneDescriptorWithoutTitles(descriptor) })
+        .map(function(descriptor : BookDescriptor) { return cloneDescriptorWithoutTitles(descriptor) })
         .sortBy('rating')
         .reverse()
         .take(maxNumber)
         .value();
 }
 
-function getBookDirectoryNames() {
+function getBookDirectoryNames() : string[] {
   var result = [];
   var files = fs.readdirSync(booksDocRoot);
   _.each(files, function(directoryName) {
@@ -83,20 +130,8 @@ function getBookDirectoryNames() {
   return result;
 }
 
-function ChapterTitleDescriptor(chapterIndex, chapterDisplayIndex, titleText) {
-  this.chapterIndex = chapterIndex;
-  this.chapterDisplayIndex = chapterDisplayIndex;
-  this.titleText = titleText;
-}
-
-function Book(descriptor, chapterSet)
-{
-  this.descriptor = descriptor;
-  this.chapterSet = chapterSet;
-}
-
-function loadBook(bookUri) {
-  if (bookLibrary[bookUri]) return bookLibrary[bookUri];
+function loadBook(bookUri : string) : boolean {
+  if (bookLibrary[bookUri]) return true;
 
   console.log('-----------------');
   console.log('Loading book for URI: ' + bookUri);
@@ -112,23 +147,23 @@ function loadBook(bookUri) {
   return true; 
 }
 
-function loadBookDescriptor(bookUri) {
+function loadBookDescriptor(bookUri : string) : BookDescriptor {
   var filepath = booksDocRoot + '\\' + bookUri + '\\bookDescriptor.json';
   var data = fs.readFileSync(filepath, 'utf8');
   var descriptor = JSON.parse(data);
   return descriptor;
 }
 
-function loadBookChapterSet(bookUri) {
+function loadBookChapterSet(bookUri : string) {
   var filepath = booksDocRoot + '\\' + bookUri + '\\bookChapters.md';
   var data = fs.readFileSync(filepath, 'utf8');
   return parseAndLoadBook(data);
 }
 
-function setBookmark(bookUri, bookmarkDescriptor) {
+function setBookmark(bookUri : string, bookmarkDescriptor : BookMark) : BookMark {
   var bookDescriptor = getBookDescriptor(bookUri, true);
   if (!bookDescriptor.bookmark) {
-    bookDescriptor.bookmark = { };  
+    bookDescriptor.bookmark = new BookMark();  
   }
 
   bookDescriptor.bookmark.chapterIndex = Number(bookmarkDescriptor.chapterIndex);
@@ -137,7 +172,7 @@ function setBookmark(bookUri, bookmarkDescriptor) {
   return bookmarkDescriptor;
 }
 
-function setRating(bookUri, newRating) {
+function setRating(bookUri : string, newRating : number) : void {
   if (bookLibrary[bookUri]) {
     bookLibrary[bookUri].descriptor.rating = newRating;
   } else {
@@ -145,7 +180,7 @@ function setRating(bookUri, newRating) {
   }
 }
 
-function determineChapterTitles(chapterSet) {
+function determineChapterTitles(chapterSet : ChapterEntry[]) : ChapterTitleDescriptor[] {
   return _.map(chapterSet, function(chapter, chapterIndex) {
     return new ChapterTitleDescriptor(
       chapterIndex,
@@ -155,7 +190,7 @@ function determineChapterTitles(chapterSet) {
   });
 }
 
-function determineHeadingText(headingNode) {
+function determineHeadingText(headingNode : commonmark.Node) : string {
   var headingText = '';
   var currentChildNode = headingNode.firstChild;
   while (currentChildNode) {
@@ -168,13 +203,13 @@ function determineHeadingText(headingNode) {
 }
 
 
-function parseAndLoadBook(fileContent) {
+function parseAndLoadBook(fileContent : string) : ChapterEntry[] {
   var parsedBookDocument = reader.parse(fileContent); // parsedBookDocument is a 'Node' tree 
 
   var currentNode = parsedBookDocument.firstChild;
 
-  var chapterSet = [];
-  var chapterEntry = {};
+  var chapterSet = new Array<ChapterEntry>();
+  var chapterEntry : ChapterEntry;
 
   // Skip nodes up to heading
   do
@@ -185,10 +220,7 @@ function parseAndLoadBook(fileContent) {
 
   while (currentNode) {
     // Create entry, with heading assigned
-    chapterEntry  = {
-      chapterHeading: currentNode,
-      chapterTextNodes: [] 
-    };
+    chapterEntry  = new ChapterEntry(currentNode, new Array<commonmark.Node>());
 
     //console.log('Reading chapter: ' + currentNode.literal);
     // Keep accumulating text nodes, up to next heading
@@ -202,28 +234,25 @@ function parseAndLoadBook(fileContent) {
   return chapterSet;
 }
 
-function cloneDescriptorWithoutTitles(descriptor) {
+function cloneDescriptorWithoutTitles(descriptor : BookDescriptor) : BookDescriptor {
     // Shallow clone the original, so as not to clear out the chapterTitles
-    return _.omit(descriptor, 'chapterTitles');
+    return <BookDescriptor> _.omit(descriptor, 'chapterTitles');
 }
 
-function getBookDescriptor(bookUri, isFetchChapterTitles) {
+function getBookDescriptor(bookUri : string, isFetchChapterTitles : boolean) : BookDescriptor {
   console.log("getBookDescriptor(): Start. isFetchChapterTitles = " + isFetchChapterTitles);
 
-  var book;
-  var result = 
-  {
-    // These following properties should be loaded from book descriptor
-    "Title": "Unknown book",
-    "Author": "Unknown Author",
-    "Posting Date": null,
-    "Release Date": null,
-    "Last updated": null,
-    "Language": "Unknown language",
+  var book : Book;
+  var result = new BookDescriptor();
+ 
+  // These following properties should be loaded from book descriptor
+  result.Title = "Unknown book";
+  result.Author = "Unknown Author";
+  result.Language = "Unknown language";
+
     // Following properties added after initial load from file
-    chapterCount: 0, 
-    bookmark: null
-  };
+  result.chapterCount = 0; 
+  result.bookmark = null;
 
   if (loadBook(bookUri)) {
     _.assign(result, bookLibrary[bookUri].descriptor);
@@ -243,17 +272,17 @@ function getBookDescriptor(bookUri, isFetchChapterTitles) {
   return result;
 }
 
-function getBookChapter(bookUri, chapterIndex) {
+function getBookChapter(bookUri : string, chapterIndex : number) : string {
   var chapterNumber = chapterIndex + 1;
   var result = '<p>Chapter - ' + chapterNumber + ' - not found</p>';
 
   if (!loadBook(bookUri)) {
-    return '<p>Book not found for URL - ' + bookUrl;
+    return '<p>Book not found for URL - ' + bookUri;
   }
 
   var book = bookLibrary[bookUri];
-  var chapterEntry;
-
+  var chapterEntry : ChapterEntry;
+  
   if (book.chapterSet[chapterIndex]) {
     chapterEntry = book.chapterSet[chapterIndex];
 
@@ -270,8 +299,8 @@ function getBookChapter(bookUri, chapterIndex) {
   return result;
 }
 
-function getAllBookDescriptors() {
-  return _.map(bookLibrary, function(book) {
+function getAllBookDescriptors() : BookDescriptor[] {
+  return _.map(bookLibrary, function(book : Book) {
     return cloneDescriptorWithoutTitles(book.descriptor)
   });
 }

@@ -2,248 +2,219 @@
 var _ = require("lodash");
 var fs = require("fs");
 var commonmark = require("commonmark");
-var reader = new commonmark.Parser();
-var writer = new commonmark.HtmlRenderer();
-var booksDocRoot = 'BOOKS_DOC_ROOT_NOT_INITIALISED';
-var bookLibrary = {};
-var BookMark = (function () {
-    function BookMark(chapterIndex, contentIndex) {
-        this.chapterIndex = chapterIndex;
-        this.contentIndex = contentIndex;
-    }
-    return BookMark;
-}());
-var ChapterEntry = (function () {
-    function ChapterEntry(chapterHeading, chapterTextNodes) {
-        this.chapterHeading = chapterHeading;
-        this.chapterTextNodes = chapterTextNodes;
-    }
-    return ChapterEntry;
-}());
-var ChapterTitleDescriptor = (function () {
-    function ChapterTitleDescriptor(chapterIndex, chapterDisplayIndex, titleText) {
-        this.chapterIndex = chapterIndex;
-        this.chapterDisplayIndex = chapterDisplayIndex;
-        this.titleText = titleText;
-    }
-    return ChapterTitleDescriptor;
-}());
-var BookDescriptor = (function () {
-    function BookDescriptor() {
-    }
-    return BookDescriptor;
-}());
-var Book = (function () {
-    function Book(descriptor, chapterSet) {
-        this.descriptor = descriptor;
-        this.chapterSet = chapterSet;
-    }
-    return Book;
-}());
-function initialiseServer(options) {
-    if (options.booksDocRoot) {
-        booksDocRoot = options.booksDocRoot;
-    }
-    loadBookMetaData();
-    initialiseRatingData();
-    initialiseBookmarks();
-}
-function initialiseBookmarks() {
-    // This bookmark information is hard-coded to supply some data for display
-    bookLibrary['JaneAusten_PrideAndPrejudice'].descriptor.bookmark = new BookMark(5, 0);
-    bookLibrary['LewisCarroll_AlicesAdventuresInWonderland'].descriptor.bookmark = new BookMark(7, 0);
-}
-function loadBookMetaData() {
-    _.each(getBookDirectoryNames(), loadBook);
-}
-function initialiseRatingData() {
-    // This rating information is hard-coded to supply some data for display
-    _.each(bookLibrary, function (book) { book.descriptor.rating = 0; }); // Apply a default for all
-    // These are the "top rated" books
-    bookLibrary['BramStoker_Dracula'].descriptor.rating = 5;
-    bookLibrary['LewisCarroll_AlicesAdventuresInWonderland'].descriptor.rating = 4;
-    bookLibrary['MarkTwain_AdventuresOfHuckleberryFinn'].descriptor.rating = 4;
-    bookLibrary['RudyardKipling_TheJungleBook'].descriptor.rating = 3;
-}
-function getBookmarkedBookDescriptors() {
-    return _.chain(bookLibrary)
-        .map('descriptor')
-        .filter(function (descriptor) {
-        var bookmark = descriptor.bookmark;
-        return _.isObjectLike(bookmark)
-            && _.isNumber(bookmark.chapterIndex)
-            && _.isNumber(bookmark.contentIndex)
-            && bookmark.chapterIndex >= 0
-            && bookmark.contentIndex >= 0;
-    })
-        .map(function (descriptor) { return cloneDescriptorWithoutTitles(descriptor); })
-        .value();
-}
-function getTopRatedBookDescriptors(maxNumber) {
-    if (!maxNumber) {
-        maxNumber = 4;
-    }
-    return _.chain(bookLibrary)
-        .map('descriptor')
-        .map(function (descriptor) { return cloneDescriptorWithoutTitles(descriptor); })
-        .sortBy('rating')
-        .reverse()
-        .take(maxNumber)
-        .value();
-}
-function getBookDirectoryNames() {
-    var result = [];
-    var files = fs.readdirSync(booksDocRoot);
-    _.each(files, function (directoryName) {
-        var fileObject = fs.statSync(booksDocRoot + '\\' + directoryName);
-        if (fileObject.isDirectory()) {
-            result.push(directoryName);
+var bookClasses_1 = require("./bookClasses");
+var BookReaderApp;
+(function (BookReaderApp) {
+    var bc = bookClasses_1.BookReaderClasses;
+    var bookLibrary = {};
+    var reader = new commonmark.Parser();
+    var writer = new commonmark.HtmlRenderer();
+    var booksDocRoot = 'BOOKS_DOC_ROOT_NOT_INITIALISED';
+    function initialiseServer(options) {
+        if (options.booksDocRoot) {
+            booksDocRoot = options.booksDocRoot;
         }
-    });
-    return result;
-}
-function loadBook(bookUri) {
-    if (bookLibrary[bookUri])
+        loadBookMetaData();
+        initialiseRatingData();
+        initialiseBookmarks();
+    }
+    function initialiseBookmarks() {
+        // This bookmark information is hard-coded to supply some data for display
+        bookLibrary['JaneAusten_PrideAndPrejudice'].descriptor.bookmark = new bc.BookMark(5, 0);
+        bookLibrary['LewisCarroll_AlicesAdventuresInWonderland'].descriptor.bookmark = new bc.BookMark(7, 0);
+    }
+    function loadBookMetaData() {
+        _.each(getBookDirectoryNames(), loadBook);
+    }
+    function initialiseRatingData() {
+        // This rating information is hard-coded to supply some data for display
+        _.each(bookLibrary, function (book) { book.descriptor.rating = 0; }); // Apply a default for all
+        // These are the "top rated" books
+        bookLibrary['BramStoker_Dracula'].descriptor.rating = 5;
+        bookLibrary['LewisCarroll_AlicesAdventuresInWonderland'].descriptor.rating = 4;
+        bookLibrary['MarkTwain_AdventuresOfHuckleberryFinn'].descriptor.rating = 4;
+        bookLibrary['RudyardKipling_TheJungleBook'].descriptor.rating = 3;
+    }
+    function getBookmarkedBookDescriptors() {
+        return _.chain(bookLibrary)
+            .map('descriptor')
+            .filter(function (descriptor) {
+            var bookmark = descriptor.bookmark;
+            return _.isObjectLike(bookmark)
+                && _.isNumber(bookmark.chapterIndex)
+                && _.isNumber(bookmark.contentIndex)
+                && bookmark.chapterIndex >= 0
+                && bookmark.contentIndex >= 0;
+        })
+            .map(function (descriptor) { return cloneDescriptorWithoutTitles(descriptor); })
+            .value();
+    }
+    function getTopRatedBookDescriptors(maxNumber) {
+        if (!maxNumber) {
+            maxNumber = 4;
+        }
+        return _.chain(bookLibrary)
+            .map('descriptor')
+            .map(function (descriptor) { return cloneDescriptorWithoutTitles(descriptor); })
+            .sortBy('rating')
+            .reverse()
+            .take(maxNumber)
+            .value();
+    }
+    function getBookDirectoryNames() {
+        var result = [];
+        var files = fs.readdirSync(booksDocRoot);
+        _.each(files, function (directoryName) {
+            var fileObject = fs.statSync(booksDocRoot + '\\' + directoryName);
+            if (fileObject.isDirectory()) {
+                result.push(directoryName);
+            }
+        });
+        return result;
+    }
+    function loadBook(bookUri) {
+        if (bookLibrary[bookUri])
+            return true;
+        console.log('-----------------');
+        console.log('Loading book for URI: ' + bookUri);
+        var chapterSet = loadBookChapterSet(bookUri);
+        var bookDescriptor = loadBookDescriptor(bookUri);
+        bookDescriptor.chapterCount = chapterSet.length;
+        bookDescriptor.chapterTitles = determineChapterTitles(chapterSet);
+        bookDescriptor.bookUri = bookUri;
+        bookDescriptor.bookmark = null;
+        bookLibrary[bookUri] = new bc.Book(bookDescriptor, chapterSet);
         return true;
-    console.log('-----------------');
-    console.log('Loading book for URI: ' + bookUri);
-    var chapterSet = loadBookChapterSet(bookUri);
-    var bookDescriptor = loadBookDescriptor(bookUri);
-    bookDescriptor.chapterCount = chapterSet.length;
-    bookDescriptor.chapterTitles = determineChapterTitles(chapterSet);
-    bookDescriptor.bookUri = bookUri;
-    bookDescriptor.bookmark = null;
-    bookLibrary[bookUri] = new Book(bookDescriptor, chapterSet);
-    return true;
-}
-function loadBookDescriptor(bookUri) {
-    var filepath = booksDocRoot + '\\' + bookUri + '\\bookDescriptor.json';
-    var data = fs.readFileSync(filepath, 'utf8');
-    var descriptor = JSON.parse(data);
-    return descriptor;
-}
-function loadBookChapterSet(bookUri) {
-    var filepath = booksDocRoot + '\\' + bookUri + '\\bookChapters.md';
-    var data = fs.readFileSync(filepath, 'utf8');
-    return parseAndLoadBook(data);
-}
-function setBookmark(bookUri, bookmarkDescriptor) {
-    var bookDescriptor = getBookDescriptor(bookUri, true);
-    if (!bookDescriptor.bookmark) {
-        bookDescriptor.bookmark = new BookMark();
     }
-    bookDescriptor.bookmark.chapterIndex = Number(bookmarkDescriptor.chapterIndex);
-    bookDescriptor.bookmark.contentIndex = Number(bookmarkDescriptor.contentIndex);
-    return bookmarkDescriptor;
-}
-function setRating(bookUri, newRating) {
-    if (bookLibrary[bookUri]) {
-        bookLibrary[bookUri].descriptor.rating = newRating;
+    function loadBookDescriptor(bookUri) {
+        var filepath = booksDocRoot + '\\' + bookUri + '\\bookDescriptor.json';
+        var data = fs.readFileSync(filepath, 'utf8');
+        var descriptor = JSON.parse(data);
+        return descriptor;
     }
-    else {
-        console.log('Canot set rating. Book not found for URI: ' + bookUri);
+    function loadBookChapterSet(bookUri) {
+        var filepath = booksDocRoot + '\\' + bookUri + '\\bookChapters.md';
+        var data = fs.readFileSync(filepath, 'utf8');
+        return parseAndLoadBook(data);
     }
-}
-function determineChapterTitles(chapterSet) {
-    return _.map(chapterSet, function (chapter, chapterIndex) {
-        return new ChapterTitleDescriptor(chapterIndex, chapterIndex, // TODO - extend this "displayIndex" to include non-zero-based, Roman numerals, etc.
-        determineHeadingText(chapter.chapterHeading));
-    });
-}
-function determineHeadingText(headingNode) {
-    var headingText = '';
-    var currentChildNode = headingNode.firstChild;
-    while (currentChildNode) {
-        if (currentChildNode.type == 'text') {
-            headingText += currentChildNode.literal;
+    function setBookmark(bookUri, bookmarkDescriptor) {
+        var bookDescriptor = getBookDescriptor(bookUri, true);
+        if (!bookDescriptor.bookmark) {
+            bookDescriptor.bookmark = new bc.BookMark();
         }
-        currentChildNode = currentChildNode.next;
+        bookDescriptor.bookmark.chapterIndex = Number(bookmarkDescriptor.chapterIndex);
+        bookDescriptor.bookmark.contentIndex = Number(bookmarkDescriptor.contentIndex);
+        return bookmarkDescriptor;
     }
-    return headingText;
-}
-function parseAndLoadBook(fileContent) {
-    var parsedBookDocument = reader.parse(fileContent); // parsedBookDocument is a 'Node' tree 
-    var currentNode = parsedBookDocument.firstChild;
-    var chapterSet = new Array();
-    var chapterEntry;
-    // Skip nodes up to heading
-    do {
-        if (currentNode.type == 'heading')
-            break;
-    } while ((currentNode = currentNode.next) !== null);
-    while (currentNode) {
-        // Create entry, with heading assigned
-        chapterEntry = new ChapterEntry(currentNode, new Array());
-        //console.log('Reading chapter: ' + currentNode.literal);
-        // Keep accumulating text nodes, up to next heading
-        while ((currentNode = currentNode.next) !== null && currentNode.type !== 'heading') {
-            //console.log('Adding node type - ' + currentNode.type);
-            chapterEntry.chapterTextNodes.push(currentNode);
+    function setRating(bookUri, newRating) {
+        if (bookLibrary[bookUri]) {
+            bookLibrary[bookUri].descriptor.rating = newRating;
         }
-        chapterSet.push(chapterEntry);
+        else {
+            console.log('Canot set rating. bc.Book not found for URI: ' + bookUri);
+        }
     }
-    return chapterSet;
-}
-function cloneDescriptorWithoutTitles(descriptor) {
-    // Shallow clone the original, so as not to clear out the chapterTitles
-    return _.omit(descriptor, 'chapterTitles');
-}
-function getBookDescriptor(bookUri, isFetchChapterTitles) {
-    console.log("getBookDescriptor(): Start. isFetchChapterTitles = " + isFetchChapterTitles);
-    var book;
-    var result = new BookDescriptor();
-    // These following properties should be loaded from book descriptor
-    result.Title = "Unknown book";
-    result.Author = "Unknown Author";
-    result.Language = "Unknown language";
-    // Following properties added after initial load from file
-    result.chapterCount = 0;
-    result.bookmark = null;
-    if (loadBook(bookUri)) {
-        _.assign(result, bookLibrary[bookUri].descriptor);
+    function determineChapterTitles(chapterSet) {
+        return _.map(chapterSet, function (chapter, chapterIndex) {
+            return new bc.ChapterTitleDescriptor(chapterIndex, chapterIndex, // TODO - extend this "displayIndex" to include non-zero-based, Roman numerals, etc.
+            determineHeadingText(chapter.chapterHeading));
+        });
     }
-    if (result.chapterTitles) {
-        console.log("chapterTitleCount = " + result.chapterTitles.length);
+    function determineHeadingText(headingNode) {
+        var headingText = '';
+        var currentChildNode = headingNode.firstChild;
+        while (currentChildNode) {
+            if (currentChildNode.type == 'text') {
+                headingText += currentChildNode.literal;
+            }
+            currentChildNode = currentChildNode.next;
+        }
+        return headingText;
     }
-    else {
-        console.log("No chapter titles loaded");
+    function parseAndLoadBook(fileContent) {
+        var parsedBookDocument = reader.parse(fileContent); // parsedBookDocument is a 'Node' tree 
+        var currentNode = parsedBookDocument.firstChild;
+        var chapterSet = new Array();
+        var chapterEntry;
+        // Skip nodes up to heading
+        do {
+            if (currentNode.type == 'heading')
+                break;
+        } while ((currentNode = currentNode.next) !== null);
+        while (currentNode) {
+            // Create entry, with heading assigned
+            chapterEntry = new bc.ChapterEntry(currentNode, new Array());
+            //console.log('Reading chapter: ' + currentNode.literal);
+            // Keep accumulating text nodes, up to next heading
+            while ((currentNode = currentNode.next) !== null && currentNode.type !== 'heading') {
+                //console.log('Adding node type - ' + currentNode.type);
+                chapterEntry.chapterTextNodes.push(currentNode);
+            }
+            chapterSet.push(chapterEntry);
+        }
+        return chapterSet;
     }
-    // Chapter titles are loaded into the descriptor by default. But
-    // don't return them if they are not needed
-    if (!isFetchChapterTitles) {
-        result = cloneDescriptorWithoutTitles(result);
+    function cloneDescriptorWithoutTitles(descriptor) {
+        // Shallow clone the original, so as not to clear out the chapterTitles
+        return _.omit(descriptor, 'chapterTitles');
     }
-    return result;
-}
-function getBookChapter(bookUri, chapterIndex) {
-    var chapterNumber = chapterIndex + 1;
-    var result = '<p>Chapter - ' + chapterNumber + ' - not found</p>';
-    if (!loadBook(bookUri)) {
-        return '<p>Book not found for URL - ' + bookUri;
+    function getBookDescriptor(bookUri, isFetchChapterTitles) {
+        console.log("getBookDescriptor(): Start. isFetchChapterTitles = " + isFetchChapterTitles);
+        var book;
+        var result = new bc.BookDescriptor();
+        // These following properties should be loaded from book descriptor
+        result.Title = "Unknown book";
+        result.Author = "Unknown Author";
+        result.Language = "Unknown language";
+        // Following properties added after initial load from file
+        result.chapterCount = 0;
+        result.bookmark = null;
+        if (loadBook(bookUri)) {
+            _.assign(result, bookLibrary[bookUri].descriptor);
+        }
+        if (result.chapterTitles) {
+            console.log("chapterTitleCount = " + result.chapterTitles.length);
+        }
+        else {
+            console.log("No chapter titles loaded");
+        }
+        // Chapter titles are loaded into the descriptor by default. But
+        // don't return them if they are not needed
+        if (!isFetchChapterTitles) {
+            result = cloneDescriptorWithoutTitles(result);
+        }
+        return result;
     }
-    var book = bookLibrary[bookUri];
-    var chapterEntry;
-    if (book.chapterSet[chapterIndex]) {
-        chapterEntry = book.chapterSet[chapterIndex];
-        // Render chapter heading
-        result = writer.render(chapterEntry.chapterHeading);
-        var renderedTextNodes = _.map(chapterEntry.chapterTextNodes, function (textNode) {
-            return writer.render(textNode);
-        }).join('');
-        result += renderedTextNodes;
+    function getBookChapter(bookUri, chapterIndex) {
+        var chapterNumber = chapterIndex + 1;
+        var result = '<p>Chapter - ' + chapterNumber + ' - not found</p>';
+        if (!loadBook(bookUri)) {
+            return '<p>bc.Book not found for URL - ' + bookUri;
+        }
+        var book = bookLibrary[bookUri];
+        var chapterEntry;
+        if (book.chapterSet[chapterIndex]) {
+            chapterEntry = book.chapterSet[chapterIndex];
+            // Render chapter heading
+            result = writer.render(chapterEntry.chapterHeading);
+            var renderedTextNodes = _.map(chapterEntry.chapterTextNodes, function (textNode) {
+                return writer.render(textNode);
+            }).join('');
+            result += renderedTextNodes;
+        }
+        return result;
     }
-    return result;
-}
-function getAllBookDescriptors() {
-    return _.map(bookLibrary, function (book) {
-        return cloneDescriptorWithoutTitles(book.descriptor);
-    });
-}
-exports.getAllBookDescriptors = getAllBookDescriptors;
-exports.getTopRatedBookDescriptors = getTopRatedBookDescriptors;
-exports.getBookmarkedBookDescriptors = getBookmarkedBookDescriptors;
-exports.getBookDescriptor = getBookDescriptor;
-exports.getBookChapter = getBookChapter;
-exports.initialiseServer = initialiseServer;
-exports.setBookmark = setBookmark;
-exports.setRating = setRating;
+    function getAllBookDescriptors() {
+        return _.map(bookLibrary, function (book) {
+            return cloneDescriptorWithoutTitles(book.descriptor);
+        });
+    }
+    exports.getAllBookDescriptors = getAllBookDescriptors;
+    exports.getTopRatedBookDescriptors = getTopRatedBookDescriptors;
+    exports.getBookmarkedBookDescriptors = getBookmarkedBookDescriptors;
+    exports.getBookDescriptor = getBookDescriptor;
+    exports.getBookChapter = getBookChapter;
+    exports.initialiseServer = initialiseServer;
+    exports.setBookmark = setBookmark;
+    exports.setRating = setRating;
+})(BookReaderApp || (BookReaderApp = {}));

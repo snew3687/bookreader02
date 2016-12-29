@@ -1,6 +1,15 @@
 {
     "compilerOptions": {
-        "target": "es5"
+        "target": "ES5"
+        //"module": "commonjs"
+        //"outFile": "MyTestOut.js"
         //"typeRoots" : ["node_modules/@types"]
-    }
+    },
+    "files": [
+        "app.js",
+        "appLocal.js",
+        "bookClasses.ts",
+        "bookServer.ts",
+        "public/scripts/*.js"
+    ]
 }

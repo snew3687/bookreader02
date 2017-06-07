@@ -156,8 +156,14 @@ var bookReader = function () {
         var postUrl = "books/" + currentBookUri + "/rating?ratingNumber=" + newRating;
         var request = $.ajax({
             url: postUrl,
-            method: "POST"
-        });
+            method: "POST",
+            data: {},
+            dataType: "json"
+        })
+            .done(handleRatingChangePosted);
+    }
+    function handleRatingChangePosted(responseBody) {
+        alert('Rating change posted');
     }
     function handleSetBookmarkDone(bookmarkDescriptor) {
         currentBookDescriptor.bookmark = bookmarkDescriptor;

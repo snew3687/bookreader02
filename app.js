@@ -2,6 +2,7 @@ var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
+var cors = require('cors');
 
 var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
@@ -11,6 +12,8 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
+app.use(cors());
+
 var bookServer = require('./bookServer.js');
 bookServer.initialiseServer(
   {
@@ -35,11 +38,7 @@ app.use(cookieParser());
 app.use(logger('dev'));
 
 // parse application/x-www-form-urlencoded
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -98,8 +97,8 @@ app.post('/books/:bookUri/bookmark', function(request, response) {
 
 app.post('/books/:bookUri/rating', function(request, response) {
   var bookUri = request.params.bookUri;
-  var newRating = request.query.ratingNumber;
-  bookServer.setRating(bookUri, newRating);
+  var newRating = Number(request.query.ratingNumber);
+    bookServer.setRating(bookUri, newRating);
 
   response
     .status(200);

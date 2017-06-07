@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var BookReaderClasses;
 (function (BookReaderClasses) {
     var BookMark = (function () {
